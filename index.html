@@ -110,7 +110,7 @@
 
   <header>
     <h1>World Cup 2026 — group tracker, projected bracket &amp; fillable knockout</h1>
-    <p>Scores below refresh automatically once a day. Edit any score box yourself to try out "what if" scenarios — the standings, third-place race, and Round of 32 matchups all recalculate live. The Round of 32 assumes the group stage ended right now, using current standings as final. Round of 16 onward is yours to fill in: click whichever team you think wins each match to send them through.</p>
+    <p>Scores below refresh automatically once a day. Matches that haven't been played yet are pre-filled with a rough guess (in red italics) so the standings and bracket below always show a complete picture — edit any box yourself to try your own "what if," or use the button below to clear the guesses back to blank. Once a match actually finishes, the real result overwrites the guess automatically. The Round of 32 assumes the group stage ended right now, using current standings as final. Round of 16 onward is yours to fill in: click whichever team you think wins each match to send them through.</p>
     <p id="last-updated" style="margin-top:8px; font-size:12px; color:var(--ink-soft);"></p>
     <div class="legend">
       <span><i class="dot green"></i> Through automatically (top 2)</span>
@@ -124,7 +124,6 @@
     <h2>Group standings</h2>
     <p class="section-note">Sorted by points, then goal difference, then goals scored. This is a simplified sort — FIFA's official tiebreakers also use head-to-head results and fair-play conduct points before falling back to the world ranking, so exact order among tied teams may differ slightly until more matches are played.</p>
     <div class="action-row">
-      <button class="action-btn" id="prefill-odds">Prefill remaining matches from betting odds</button>
       <button class="action-btn secondary" id="clear-odds">Clear simulated scores</button>
     </div>
     <div class="groups" id="groups"></div>
@@ -152,98 +151,98 @@ const GROUPS = {
   A: { teams:['Mexico','South Korea','Czechia','South Africa'], matches:[
     {h:'Mexico',a:'South Africa',d:'Jun 11',hs:2,as:0},
     {h:'South Korea',a:'Czechia',d:'Jun 11',hs:2,as:1},
-    {h:'Czechia',a:'South Africa',d:'Jun 18',hs:null,as:null},
-    {h:'Mexico',a:'South Korea',d:'Jun 18',hs:null,as:null},
-    {h:'Czechia',a:'Mexico',d:'Jun 24',hs:null,as:null},
-    {h:'South Africa',a:'South Korea',d:'Jun 24',hs:null,as:null},
+    {h:'Czechia',a:'South Africa',d:'Jun 18',hs:2,as:1,predicted:true},
+    {h:'Mexico',a:'South Korea',d:'Jun 18',hs:2,as:1,predicted:true},
+    {h:'Czechia',a:'Mexico',d:'Jun 24',hs:1,as:1,predicted:true},
+    {h:'South Africa',a:'South Korea',d:'Jun 24',hs:1,as:2,predicted:true},
   ]},
   B: { teams:['Canada','Bosnia and Herzegovina','Qatar','Switzerland'], matches:[
     {h:'Canada',a:'Bosnia and Herzegovina',d:'Jun 12',hs:1,as:1},
     {h:'Qatar',a:'Switzerland',d:'Jun 13',hs:1,as:1},
-    {h:'Switzerland',a:'Bosnia and Herzegovina',d:'Jun 18',hs:null,as:null},
-    {h:'Canada',a:'Qatar',d:'Jun 18',hs:null,as:null},
-    {h:'Switzerland',a:'Canada',d:'Jun 24',hs:null,as:null},
-    {h:'Bosnia and Herzegovina',a:'Qatar',d:'Jun 24',hs:null,as:null},
+    {h:'Switzerland',a:'Bosnia and Herzegovina',d:'Jun 18',hs:2,as:0,predicted:true},
+    {h:'Canada',a:'Qatar',d:'Jun 18',hs:2,as:0,predicted:true},
+    {h:'Switzerland',a:'Canada',d:'Jun 24',hs:1,as:1,predicted:true},
+    {h:'Bosnia and Herzegovina',a:'Qatar',d:'Jun 24',hs:2,as:1,predicted:true},
   ]},
   C: { teams:['Brazil','Morocco','Haiti','Scotland'], matches:[
     {h:'Brazil',a:'Morocco',d:'Jun 13',hs:1,as:1},
     {h:'Haiti',a:'Scotland',d:'Jun 13',hs:0,as:1},
-    {h:'Scotland',a:'Morocco',d:'Jun 19',hs:null,as:null},
-    {h:'Brazil',a:'Haiti',d:'Jun 19',hs:null,as:null},
-    {h:'Scotland',a:'Brazil',d:'Jun 24',hs:null,as:null},
-    {h:'Morocco',a:'Haiti',d:'Jun 24',hs:null,as:null},
+    {h:'Scotland',a:'Morocco',d:'Jun 19',hs:1,as:2,predicted:true},
+    {h:'Brazil',a:'Haiti',d:'Jun 19',hs:4,as:0,predicted:true},
+    {h:'Scotland',a:'Brazil',d:'Jun 24',hs:1,as:3,predicted:true},
+    {h:'Morocco',a:'Haiti',d:'Jun 24',hs:3,as:0,predicted:true},
   ]},
   D: { teams:['United States','Paraguay','Australia','Türkiye'], matches:[
     {h:'United States',a:'Paraguay',d:'Jun 12',hs:4,as:1},
     {h:'Australia',a:'Türkiye',d:'Jun 13',hs:2,as:0},
-    {h:'United States',a:'Australia',d:'Jun 19',hs:null,as:null},
-    {h:'Türkiye',a:'Paraguay',d:'Jun 19',hs:null,as:null},
-    {h:'Türkiye',a:'United States',d:'Jun 25',hs:null,as:null},
-    {h:'Paraguay',a:'Australia',d:'Jun 25',hs:null,as:null},
+    {h:'United States',a:'Australia',d:'Jun 19',hs:2,as:1,predicted:true},
+    {h:'Türkiye',a:'Paraguay',d:'Jun 19',hs:1,as:1,predicted:true},
+    {h:'Türkiye',a:'United States',d:'Jun 25',hs:1,as:1,predicted:true},
+    {h:'Paraguay',a:'Australia',d:'Jun 25',hs:1,as:1,predicted:true},
   ]},
   E: { teams:['Germany','Curaçao','Ivory Coast','Ecuador'], matches:[
     {h:'Germany',a:'Curaçao',d:'Jun 14',hs:7,as:1},
     {h:'Ivory Coast',a:'Ecuador',d:'Jun 14',hs:1,as:0},
-    {h:'Germany',a:'Ivory Coast',d:'Jun 20',hs:null,as:null},
-    {h:'Ecuador',a:'Curaçao',d:'Jun 20',hs:null,as:null},
-    {h:'Ecuador',a:'Germany',d:'Jun 25',hs:null,as:null},
-    {h:'Curaçao',a:'Ivory Coast',d:'Jun 25',hs:null,as:null},
+    {h:'Germany',a:'Ivory Coast',d:'Jun 20',hs:3,as:0,predicted:true},
+    {h:'Ecuador',a:'Curaçao',d:'Jun 20',hs:2,as:0,predicted:true},
+    {h:'Ecuador',a:'Germany',d:'Jun 25',hs:1,as:2,predicted:true},
+    {h:'Curaçao',a:'Ivory Coast',d:'Jun 25',hs:0,as:2,predicted:true},
   ]},
   F: { teams:['Netherlands','Japan','Sweden','Tunisia'], matches:[
     {h:'Netherlands',a:'Japan',d:'Jun 14',hs:2,as:2},
     {h:'Sweden',a:'Tunisia',d:'Jun 14',hs:5,as:1},
-    {h:'Netherlands',a:'Sweden',d:'Jun 20',hs:null,as:null},
-    {h:'Tunisia',a:'Japan',d:'Jun 20',hs:null,as:null},
-    {h:'Japan',a:'Sweden',d:'Jun 25',hs:null,as:null},
-    {h:'Tunisia',a:'Netherlands',d:'Jun 25',hs:null,as:null},
+    {h:'Netherlands',a:'Sweden',d:'Jun 20',hs:2,as:1,predicted:true},
+    {h:'Tunisia',a:'Japan',d:'Jun 20',hs:1,as:2,predicted:true},
+    {h:'Japan',a:'Sweden',d:'Jun 25',hs:1,as:1,predicted:true},
+    {h:'Tunisia',a:'Netherlands',d:'Jun 25',hs:0,as:2,predicted:true},
   ]},
   G: { teams:['Belgium','Egypt','Iran','New Zealand'], matches:[
     {h:'Belgium',a:'Egypt',d:'Jun 15',hs:1,as:1},
     {h:'Iran',a:'New Zealand',d:'Jun 15',hs:2,as:2},
-    {h:'Belgium',a:'Iran',d:'Jun 21',hs:null,as:null},
-    {h:'New Zealand',a:'Egypt',d:'Jun 21',hs:null,as:null},
-    {h:'Egypt',a:'Iran',d:'Jun 26',hs:null,as:null},
-    {h:'New Zealand',a:'Belgium',d:'Jun 26',hs:null,as:null},
+    {h:'Belgium',a:'Iran',d:'Jun 21',hs:2,as:0,predicted:true},
+    {h:'New Zealand',a:'Egypt',d:'Jun 21',hs:1,as:1,predicted:true},
+    {h:'Egypt',a:'Iran',d:'Jun 26',hs:1,as:1,predicted:true},
+    {h:'New Zealand',a:'Belgium',d:'Jun 26',hs:0,as:2,predicted:true},
   ]},
   H: { teams:['Spain','Cape Verde','Saudi Arabia','Uruguay'], matches:[
     {h:'Spain',a:'Cape Verde',d:'Jun 15',hs:0,as:0},
     {h:'Saudi Arabia',a:'Uruguay',d:'Jun 15',hs:1,as:1},
-    {h:'Spain',a:'Saudi Arabia',d:'Jun 21',hs:null,as:null},
-    {h:'Uruguay',a:'Cape Verde',d:'Jun 21',hs:null,as:null},
-    {h:'Cape Verde',a:'Saudi Arabia',d:'Jun 26',hs:null,as:null},
-    {h:'Uruguay',a:'Spain',d:'Jun 26',hs:null,as:null},
+    {h:'Spain',a:'Saudi Arabia',d:'Jun 21',hs:3,as:0,predicted:true},
+    {h:'Uruguay',a:'Cape Verde',d:'Jun 21',hs:2,as:0,predicted:true},
+    {h:'Cape Verde',a:'Saudi Arabia',d:'Jun 26',hs:1,as:1,predicted:true},
+    {h:'Uruguay',a:'Spain',d:'Jun 26',hs:1,as:2,predicted:true},
   ]},
   I: { teams:['France','Senegal','Iraq','Norway'], matches:[
     {h:'France',a:'Senegal',d:'Jun 16',hs:3,as:1},
     {h:'Iraq',a:'Norway',d:'Jun 16',hs:1,as:4},
-    {h:'France',a:'Iraq',d:'Jun 22',hs:null,as:null},
-    {h:'Norway',a:'Senegal',d:'Jun 22',hs:null,as:null},
-    {h:'Norway',a:'France',d:'Jun 26',hs:null,as:null},
-    {h:'Senegal',a:'Iraq',d:'Jun 26',hs:null,as:null},
+    {h:'France',a:'Iraq',d:'Jun 22',hs:3,as:0,predicted:true},
+    {h:'Norway',a:'Senegal',d:'Jun 22',hs:2,as:1,predicted:true},
+    {h:'Norway',a:'France',d:'Jun 26',hs:1,as:1,predicted:true},
+    {h:'Senegal',a:'Iraq',d:'Jun 26',hs:2,as:0,predicted:true},
   ]},
   J: { teams:['Argentina','Algeria','Austria','Jordan'], matches:[
     {h:'Argentina',a:'Algeria',d:'Jun 16',hs:3,as:0},
     {h:'Austria',a:'Jordan',d:'Jun 17',hs:3,as:1},
-    {h:'Argentina',a:'Austria',d:'Jun 22',hs:null,as:null},
-    {h:'Jordan',a:'Algeria',d:'Jun 22',hs:null,as:null},
-    {h:'Algeria',a:'Austria',d:'Jun 27',hs:null,as:null},
-    {h:'Jordan',a:'Argentina',d:'Jun 27',hs:null,as:null},
+    {h:'Argentina',a:'Austria',d:'Jun 22',hs:2,as:1,predicted:true},
+    {h:'Jordan',a:'Algeria',d:'Jun 22',hs:0,as:2,predicted:true},
+    {h:'Algeria',a:'Austria',d:'Jun 27',hs:1,as:1,predicted:true},
+    {h:'Jordan',a:'Argentina',d:'Jun 27',hs:0,as:3,predicted:true},
   ]},
   K: { teams:['Portugal','DR Congo','Uzbekistan','Colombia'], matches:[
     {h:'Portugal',a:'DR Congo',d:'Jun 17',hs:1,as:1},
-    {h:'Uzbekistan',a:'Colombia',d:'Jun 17',hs:null,as:null},
-    {h:'Portugal',a:'Uzbekistan',d:'Jun 23',hs:null,as:null},
-    {h:'Colombia',a:'DR Congo',d:'Jun 23',hs:null,as:null},
-    {h:'Colombia',a:'Portugal',d:'Jun 27',hs:null,as:null},
-    {h:'DR Congo',a:'Uzbekistan',d:'Jun 27',hs:null,as:null},
+    {h:'Uzbekistan',a:'Colombia',d:'Jun 17',hs:0,as:2,predicted:true},
+    {h:'Portugal',a:'Uzbekistan',d:'Jun 23',hs:3,as:0,predicted:true},
+    {h:'Colombia',a:'DR Congo',d:'Jun 23',hs:2,as:0,predicted:true},
+    {h:'Colombia',a:'Portugal',d:'Jun 27',hs:1,as:1,predicted:true},
+    {h:'DR Congo',a:'Uzbekistan',d:'Jun 27',hs:1,as:1,predicted:true},
   ]},
   L: { teams:['England','Croatia','Ghana','Panama'], matches:[
     {h:'England',a:'Croatia',d:'Jun 17',hs:4,as:2},
-    {h:'Ghana',a:'Panama',d:'Jun 17',hs:null,as:null},
-    {h:'England',a:'Ghana',d:'Jun 23',hs:null,as:null},
-    {h:'Panama',a:'Croatia',d:'Jun 23',hs:null,as:null},
-    {h:'Panama',a:'England',d:'Jun 27',hs:null,as:null},
-    {h:'Croatia',a:'Ghana',d:'Jun 27',hs:null,as:null},
+    {h:'Ghana',a:'Panama',d:'Jun 17',hs:2,as:1,predicted:true},
+    {h:'England',a:'Ghana',d:'Jun 23',hs:2,as:0,predicted:true},
+    {h:'Panama',a:'Croatia',d:'Jun 23',hs:0,as:2,predicted:true},
+    {h:'Panama',a:'England',d:'Jun 27',hs:0,as:2,predicted:true},
+    {h:'Croatia',a:'Ghana',d:'Jun 27',hs:2,as:1,predicted:true},
   ]},
 };
 
@@ -879,23 +878,6 @@ function buildGroupShells(){
   });
 }
 
-function prefillFromOdds(){
-  const el = document.getElementById('groups');
-  Object.keys(GROUPS).forEach(g => {
-    GROUPS[g].matches.forEach((m, idx) => {
-      if (m.hs !== null || m.as !== null) return; // leave real results and existing edits alone
-      const pred = PREDICTIONS[`${g}_${idx}`];
-      if (!pred) return;
-      m.hs = pred.hs; m.as = pred.as; m.predicted = true;
-      el.querySelectorAll(`input[data-g="${g}"][data-i="${idx}"]`).forEach(inp => {
-        inp.value = inp.dataset.side === 'h' ? pred.hs : pred.as;
-        inp.classList.add('predicted');
-      });
-    });
-  });
-  refreshComputed();
-}
-
 function clearPredictions(){
   const el = document.getElementById('groups');
   Object.keys(GROUPS).forEach(g => {
@@ -911,11 +893,9 @@ function clearPredictions(){
   refreshComputed();
 }
 
-document.getElementById('prefill-odds').addEventListener('click', prefillFromOdds);
 document.getElementById('clear-odds').addEventListener('click', clearPredictions);
 
 const picks = {};
-const PREDICTIONS = {};
 
 function refreshComputed(){
   const allStandings = {};
@@ -1060,10 +1040,8 @@ async function loadResultsAndStart(){
         if (GROUPS[g] && GROUPS[g].matches[idx]){
           GROUPS[g].matches[idx].hs = val.hs;
           GROUPS[g].matches[idx].as = val.as;
+          GROUPS[g].matches[idx].predicted = false;
         }
-      });
-      Object.entries(data.predictions || {}).forEach(([key, val]) => {
-        PREDICTIONS[key] = val;
       });
       const lu = document.getElementById('last-updated');
       if (lu && data.lastUpdated){
