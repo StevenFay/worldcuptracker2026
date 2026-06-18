@@ -104,7 +104,8 @@
 
   <header>
     <h1>World Cup 2026 — group tracker, projected bracket &amp; fillable knockout</h1>
-    <p>Live scores entered below as of June 18, 2026 — edit any score box and the standings, third-place race, and Round of 32 matchups all recalculate. The Round of 32 below assumes the group stage ended right now, using today's standings as final. Round of 16 onward is yours to fill in: click whichever team you think wins each match to send them through.</p>
+    <p>Scores below refresh automatically once a day. Edit any score box yourself to try out "what if" scenarios — the standings, third-place race, and Round of 32 matchups all recalculate live. The Round of 32 assumes the group stage ended right now, using current standings as final. Round of 16 onward is yours to fill in: click whichever team you think wins each match to send them through.</p>
+    <p id="last-updated" style="margin-top:8px; font-size:12px; color:var(--ink-soft);"></p>
     <div class="legend">
       <span><i class="dot green"></i> Through automatically (top 2)</span>
       <span><i class="dot amber"></i> 3rd place, currently inside the best-8 wildcard spots</span>
@@ -131,7 +132,7 @@
     <div id="bracket"></div>
   </section>
 
-  <p class="updated">Real group-stage results locked in above: every Matchday 1 game through June 17, plus Group K's Uzbekistan–Colombia and Group L's Ghana–Panama games which were still being played as this was built — fill those two in once they finish. Everything else in the group tables is editable, and your bracket picks are remembered as you go (just not saved between visits — it's all in this browser tab's memory). This file works fully offline once it's open.</p>
+  <p class="updated">Scores pull automatically from a daily GitHub Action once this is deployed (see <code>data/results.json</code>) — opened as a plain local file instead, it'll just show whatever was baked in at build time. Anything you type into a score box is a "what if" override for that browser tab only, not saved anywhere. Bracket picks work the same way — they live in memory and reset on reload.</p>
 
 </div>
 
@@ -996,8 +997,33 @@ document.getElementById('reset-picks').addEventListener('click', () => {
   refreshComputed();
 });
 
-buildGroupShells();
-refreshComputed();
+async function loadResultsAndStart(){
+  try {
+    const res = await fetch('data/results.json', {cache:'no-store'});
+    if (res.ok){
+      const data = await res.json();
+      Object.entries(data.results || {}).forEach(([key, val]) => {
+        const [g, idxStr] = key.split('_');
+        const idx = Number(idxStr);
+        if (GROUPS[g] && GROUPS[g].matches[idx]){
+          GROUPS[g].matches[idx].hs = val.hs;
+          GROUPS[g].matches[idx].as = val.as;
+        }
+      });
+      const lu = document.getElementById('last-updated');
+      if (lu && data.lastUpdated){
+        lu.textContent = `Auto-refreshed: ${new Date(data.lastUpdated).toLocaleString()}`;
+      }
+    }
+  } catch (e) {
+    // Fetch fails when opened directly as a local file (no server) — the
+    // scores baked in above are used instead. Works fine over GitHub Pages.
+    console.warn('Could not load data/results.json, using built-in scores.', e);
+  }
+  buildGroupShells();
+  refreshComputed();
+}
+loadResultsAndStart();
 </script>
 </body>
 </html>
