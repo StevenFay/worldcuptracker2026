@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>World Cup 2026 — Live tracker &amp; Round of 32 projector</title>
+<title>World Cup 2026 — Live tracker, projected bracket &amp; fillable knockout</title>
 <style>
   :root{
     --bg:#f7f6f1;
@@ -16,19 +16,15 @@
     --amber:#a9690f;
     --amber-light:#fbf0dd;
     --red:#9a2f2f;
-    --red-light:#f7e8e6;
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
-    -webkit-font-smoothing:antialiased;
-  }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased;}
   .wrap{max-width:1180px; margin:0 auto; padding:28px 20px 80px;}
   header{margin-bottom:18px;}
   header h1{font-size:25px; margin:0 0 6px; letter-spacing:-0.01em;}
-  header p{margin:0; color:var(--ink-soft); font-size:14px; line-height:1.5; max-width:760px;}
+  header p{margin:0; color:var(--ink-soft); font-size:14px; line-height:1.5; max-width:780px;}
   .legend{display:flex; flex-wrap:wrap; gap:14px; margin:16px 0 6px; font-size:12px; color:var(--ink-soft);}
   .legend span{display:inline-flex; align-items:center; gap:6px;}
   .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
@@ -38,15 +34,14 @@
 
   section{margin-top:34px;}
   h2{font-size:17px; margin:0 0 4px;}
-  .section-note{color:var(--ink-soft); font-size:13px; margin:0 0 14px; max-width:760px; line-height:1.5;}
+  .section-note{color:var(--ink-soft); font-size:13px; margin:0 0 14px; max-width:780px; line-height:1.5;}
 
   .groups{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;}
   @media (max-width:920px){ .groups{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:600px){ .groups{grid-template-columns:1fr;} }
 
   .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 14px 12px; }
-  .card h3{margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); display:flex; justify-content:space-between; align-items:baseline;}
-  .card h3 b{color:var(--ink); font-size:14px;}
+  .card h3{margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft);}
 
   table.standings{width:100%; border-collapse:collapse; font-size:13px; margin-bottom:10px;}
   table.standings th{text-align:left; font-weight:500; color:var(--ink-soft); font-size:11px; padding:2px 4px 6px; border-bottom:1px solid var(--line);}
@@ -59,14 +54,10 @@
   .teamname{font-weight:500;}
 
   .fixtures{font-size:12px; color:var(--ink-soft);}
-  .fixtures .md-label{margin:8px 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:#9b9a91;}
   .matchrow{display:flex; align-items:center; gap:6px; padding:3px 0;}
   .matchrow .side{flex:1; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .matchrow .side.away{text-align:left;}
-  .matchrow input{
-    width:30px; text-align:center; font-family:var(--mono); font-size:13px;
-    border:1px solid var(--line); border-radius:5px; padding:3px 2px; background:var(--bg); color:var(--ink);
-  }
+  .matchrow input{width:30px; text-align:center; font-family:var(--mono); font-size:13px; border:1px solid var(--line); border-radius:5px; padding:3px 2px; background:var(--bg); color:var(--ink);}
   .matchrow input:focus{outline:2px solid var(--pitch); outline-offset:1px;}
   .matchrow .vs{color:#b9b6a9; font-size:11px;}
   .matchrow .date{width:46px; text-align:right; color:#a9a79c; font-size:11px;}
@@ -83,13 +74,27 @@
   .pill.qualified{background:var(--pitch); color:#fff;}
   .pill.out{background:#e7e4d9; color:#7a7868;}
 
-  .r32{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
-  @media (max-width:760px){ .r32{grid-template-columns:1fr;} }
-  .match-card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px;}
+  .reset-row{display:flex; justify-content:flex-end; margin-bottom:10px;}
+  .reset-btn{font-size:12px; padding:6px 12px; border:1px solid var(--line); border-radius:8px; background:var(--card); cursor:pointer; color:var(--ink-soft);}
+  .reset-btn:hover{border-color:var(--red); color:var(--red);}
+
+  .round-block{margin-top:22px;}
+  .round-title{font-size:14px; font-weight:500; margin:0 0 3px;}
+  .round-dates{font-size:11.5px; color:var(--ink-soft); margin:0 0 10px;}
+  .bgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  @media (max-width:760px){ .bgrid{grid-template-columns:1fr;} }
+  .bgrid.single{grid-template-columns:1fr; max-width:380px;}
+  .match-card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
   .match-card .date{font-size:11px; color:#a9a79c; margin-bottom:6px;}
-  .match-card .pairing{display:flex; align-items:center; justify-content:space-between; font-size:14px; font-weight:500; gap:10px;}
-  .match-card .pairing .tbd{color:var(--amber); font-weight:400; font-size:12.5px;}
-  .match-card .meta{font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
+  .match-card .match-id{font-size:10.5px; color:#b3b1a6; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.03em;}
+  .teambtn{display:block; width:100%; text-align:left; font-family:inherit; font-size:13.5px; padding:7px 9px; margin-bottom:5px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); cursor:pointer;}
+  .teambtn:last-child{margin-bottom:0;}
+  .teambtn:hover{border-color:var(--pitch);}
+  .teambtn.picked{background:var(--pitch); border-color:var(--pitch); color:#fff; font-weight:500;}
+  .teambtn.notpicked{opacity:0.5;}
+  .teambtn.placeholder{cursor:default; color:var(--ink-soft); border-style:dashed; background:transparent;}
+  .teambtn.placeholder:hover{border-color:var(--line);}
+  .meta-sub{font-size:11px; color:#a9a79c; margin-top:2px;}
 
   .updated{font-size:12px; color:var(--ink-soft); border-top:1px solid var(--line); margin-top:40px; padding-top:14px; line-height:1.6;}
 </style>
@@ -98,8 +103,8 @@
 <div class="wrap">
 
   <header>
-    <h1>World Cup 2026 — group tracker &amp; Round of 32 projector</h1>
-    <p>Live scores entered below as of June 18, 2026. Edit any score box as matches finish and everything — standings, the third-place race, and the projected last-32 matchups — recalculates automatically.</p>
+    <h1>World Cup 2026 — group tracker, projected bracket &amp; fillable knockout</h1>
+    <p>Live scores entered below as of June 18, 2026 — edit any score box and the standings, third-place race, and Round of 32 matchups all recalculate. The Round of 32 below assumes the group stage ended right now, using today's standings as final. Round of 16 onward is yours to fill in: click whichever team you think wins each match to send them through.</p>
     <div class="legend">
       <span><i class="dot green"></i> Through automatically (top 2)</span>
       <span><i class="dot amber"></i> 3rd place, currently inside the best-8 wildcard spots</span>
@@ -115,17 +120,18 @@
 
   <section>
     <h2>Third-place race</h2>
-    <p class="section-note">Eight of the twelve third-place finishers join the 24 group winners and runners-up in the Round of 32. Ranked the same way as above, across all 12 groups.</p>
+    <p class="section-note">Eight of the twelve third-place finishers join the 24 group winners and runners-up in the Round of 32. Ranked the same way as above, across all 12 groups. Which exact eight qualify also decides who each group winner draws below — FIFA pairs them using a fixed table covering all 495 possible combinations of qualifiers, applied live here.</p>
     <div class="thirdplace"><table class="tp" id="tp-table"></table></div>
   </section>
 
   <section>
-    <h2>Round of 32 — projected from current standings</h2>
-    <p class="section-note">FIFA fixes 8 of these 16 matchups purely by group winner/runner-up, so those are filled in below using the live table above. The other 8 pit a group winner against one of the eight qualifying third-place teams — FIFA only locks in exactly which third-place team lands in which slot once the group stage ends on June 27, using a pre-published table covering all 495 possible combinations of qualifiers. Those slots are marked TBD; the third-place race above shows who's currently in the running.</p>
-    <div class="r32" id="r32"></div>
+    <h2>Knockout bracket — assuming the groups end today</h2>
+    <p class="section-note">The Round of 32 below is filled in completely: the 8 winner-vs-runner-up pairings come straight from the live standings above, and the other 8 third-place matchups use FIFA's actual published assignment table for whichever specific combination of eight third-place teams currently qualifies. From the Round of 16 on, nobody knows the results yet — click a team in any match to advance them, and everything downstream updates automatically.</p>
+    <div class="reset-row"><button class="reset-btn" id="reset-picks">Reset my bracket picks</button></div>
+    <div id="bracket"></div>
   </section>
 
-  <p class="updated">Real results locked in above: every Matchday 1 game through June 17, plus Group K's Uzbekistan–Colombia and Group L's Ghana–Panama games which were still being played as this was built — fill those two in once they finish. Everything else is editable so you can play out the rest of the group stage and watch the Round of 32 picture take shape. This file works offline — no internet connection needed once it's open.</p>
+  <p class="updated">Real group-stage results locked in above: every Matchday 1 game through June 17, plus Group K's Uzbekistan–Colombia and Group L's Ghana–Panama games which were still being played as this was built — fill those two in once they finish. Everything else in the group tables is editable, and your bracket picks are remembered as you go (just not saved between visits — it's all in this browser tab's memory). This file works fully offline once it's open.</p>
 
 </div>
 
@@ -229,28 +235,571 @@ const GROUPS = {
   ]},
 };
 
-// Deterministic (winner/runner-up only) matches
+// Round of 32 — the 8 matchups decided purely by group winner/runner-up
 const R32_DET = [
-  {date:'Jun 28', city:'Inglewood, Calif.', g1:'A', p1:1, g2:'B', p2:1},
-  {date:'Jun 29', city:'Houston', g1:'C', p1:0, g2:'F', p2:1},
-  {date:'Jun 29', city:'Guadalupe, Mexico', g1:'F', p1:0, g2:'C', p2:1},
-  {date:'Jun 30', city:'Arlington, Texas', g1:'E', p1:1, g2:'I', p2:1},
-  {date:'Jul 2', city:'Inglewood, Calif.', g1:'H', p1:0, g2:'J', p2:1},
-  {date:'Jul 2', city:'Toronto', g1:'K', p1:1, g2:'L', p2:1},
-  {date:'Jul 3', city:'Arlington, Texas', g1:'D', p1:1, g2:'G', p2:1},
-  {date:'Jul 3', city:'Miami Gardens, Fla.', g1:'J', p1:0, g2:'H', p2:1},
+  {id:73, date:'Jun 28', city:'Inglewood, Calif.', g1:'A', p1:1, g2:'B', p2:1},
+  {id:76, date:'Jun 29', city:'Houston',            g1:'C', p1:0, g2:'F', p2:1},
+  {id:75, date:'Jun 29', city:'Guadalupe, Mexico',  g1:'F', p1:0, g2:'C', p2:1},
+  {id:78, date:'Jun 30', city:'Arlington, Texas',   g1:'E', p1:1, g2:'I', p2:1},
+  {id:84, date:'Jul 2',  city:'Inglewood, Calif.',  g1:'H', p1:0, g2:'J', p2:1},
+  {id:83, date:'Jul 2',  city:'Toronto',            g1:'K', p1:1, g2:'L', p2:1},
+  {id:88, date:'Jul 3',  city:'Arlington, Texas',   g1:'D', p1:1, g2:'G', p2:1},
+  {id:86, date:'Jul 3',  city:'Miami Gardens, Fla.',g1:'J', p1:0, g2:'H', p2:1},
 ];
-// Group-winner vs best-third-place slots
+// Round of 32 — group winner vs best-third-place team (opponent resolved via Annex C below)
 const R32_THIRD = [
-  {date:'Jun 29', city:'Foxborough, Mass.', g:'E'},
-  {date:'Jun 30', city:'East Rutherford, N.J.', g:'I'},
-  {date:'Jun 30', city:'Mexico City', g:'A'},
-  {date:'Jul 1', city:'Atlanta', g:'L'},
-  {date:'Jul 1', city:'Seattle', g:'G'},
-  {date:'Jul 1', city:'Santa Clara, Calif.', g:'D'},
-  {date:'Jul 2', city:'Vancouver, Canada', g:'B'},
-  {date:'Jul 3', city:'Kansas City, Mo.', g:'K'},
+  {id:74, date:'Jun 29', city:'Foxborough, Mass.',     g:'E'},
+  {id:77, date:'Jun 30', city:'East Rutherford, N.J.', g:'I'},
+  {id:79, date:'Jun 30', city:'Mexico City',           g:'A'},
+  {id:80, date:'Jul 1',  city:'Atlanta',                g:'L'},
+  {id:82, date:'Jul 1',  city:'Seattle',                g:'G'},
+  {id:81, date:'Jul 1',  city:'Santa Clara, Calif.',    g:'D'},
+  {id:85, date:'Jul 2',  city:'Vancouver, Canada',      g:'B'},
+  {id:87, date:'Jul 3',  city:'Kansas City, Mo.',       g:'K'},
 ];
+
+// Round of 16 / QF / SF / 3rd-place / Final — official bracket connectivity (FIFA match numbers 89-104)
+const LATER_ROUNDS = [
+  {id:89,  round:'Round of 16', s1:{type:'winnerOf', id:74}, s2:{type:'winnerOf', id:77}},
+  {id:90,  round:'Round of 16', s1:{type:'winnerOf', id:73}, s2:{type:'winnerOf', id:75}},
+  {id:91,  round:'Round of 16', s1:{type:'winnerOf', id:76}, s2:{type:'winnerOf', id:78}},
+  {id:92,  round:'Round of 16', s1:{type:'winnerOf', id:79}, s2:{type:'winnerOf', id:80}},
+  {id:93,  round:'Round of 16', s1:{type:'winnerOf', id:83}, s2:{type:'winnerOf', id:84}},
+  {id:94,  round:'Round of 16', s1:{type:'winnerOf', id:81}, s2:{type:'winnerOf', id:82}},
+  {id:95,  round:'Round of 16', s1:{type:'winnerOf', id:86}, s2:{type:'winnerOf', id:88}},
+  {id:96,  round:'Round of 16', s1:{type:'winnerOf', id:85}, s2:{type:'winnerOf', id:87}},
+  {id:97,  round:'Quarterfinals', s1:{type:'winnerOf', id:89}, s2:{type:'winnerOf', id:90}},
+  {id:98,  round:'Quarterfinals', s1:{type:'winnerOf', id:93}, s2:{type:'winnerOf', id:94}},
+  {id:99,  round:'Quarterfinals', s1:{type:'winnerOf', id:91}, s2:{type:'winnerOf', id:92}},
+  {id:100, round:'Quarterfinals', s1:{type:'winnerOf', id:95}, s2:{type:'winnerOf', id:96}},
+  {id:101, round:'Semifinals', s1:{type:'winnerOf', id:97}, s2:{type:'winnerOf', id:98}},
+  {id:102, round:'Semifinals', s1:{type:'winnerOf', id:99}, s2:{type:'winnerOf', id:100}},
+  {id:103, round:'Third-place play-off', s1:{type:'loserOf', id:101}, s2:{type:'loserOf', id:102}},
+  {id:104, round:'Final', s1:{type:'winnerOf', id:101}, s2:{type:'winnerOf', id:102}},
+];
+const ROUND_DATES = {
+  'Round of 16':'Jul 4 – Jul 7',
+  'Quarterfinals':'Jul 9 – Jul 11',
+  'Semifinals':'Jul 14 – Jul 15',
+  'Third-place play-off':'Jul 18, Miami Gardens, Fla.',
+  'Final':'Jul 19, East Rutherford, N.J. (MetLife Stadium)',
+};
+
+// FIFA's Annex C: all 495 possible combinations of which 8 of the 12 groups
+// supply the qualifying third-place team, and who each affected group winner
+// (A, B, D, E, G, I, K, L) draws as a result. Source: 2026 FIFA World Cup
+// Competition Regulations, Annex C.
+const ANNEX_C_RAW = `
+1: E; F; G; H; I; J; K; L; 3E; 3J; 3I; 3F; 3H; 3G; 3L; 3K
+2: D; F; G; H; I; J; K; L; 3H; 3G; 3I; 3D; 3J; 3F; 3L; 3K
+3: D; E; G; H; I; J; K; L; 3E; 3J; 3I; 3D; 3H; 3G; 3L; 3K
+4: D; E; F; H; I; J; K; L; 3E; 3J; 3I; 3D; 3H; 3F; 3L; 3K
+5: D; E; F; G; I; J; K; L; 3E; 3G; 3I; 3D; 3J; 3F; 3L; 3K
+6: D; E; F; G; H; J; K; L; 3E; 3G; 3J; 3D; 3H; 3F; 3L; 3K
+7: D; E; F; G; H; I; K; L; 3E; 3G; 3I; 3D; 3H; 3F; 3L; 3K
+8: D; E; F; G; H; I; J; L; 3E; 3G; 3J; 3D; 3H; 3F; 3L; 3I
+9: D; E; F; G; H; I; J; K; 3E; 3G; 3J; 3D; 3H; 3F; 3I; 3K
+10: C; F; G; H; I; J; K; L; 3H; 3G; 3I; 3C; 3J; 3F; 3L; 3K
+11: C; E; G; H; I; J; K; L; 3E; 3J; 3I; 3C; 3H; 3G; 3L; 3K
+12: C; E; F; H; I; J; K; L; 3E; 3J; 3I; 3C; 3H; 3F; 3L; 3K
+13: C; E; F; G; I; J; K; L; 3E; 3G; 3I; 3C; 3J; 3F; 3L; 3K
+14: C; E; F; G; H; J; K; L; 3E; 3G; 3J; 3C; 3H; 3F; 3L; 3K
+15: C; E; F; G; H; I; K; L; 3E; 3G; 3I; 3C; 3H; 3F; 3L; 3K
+16: C; E; F; G; H; I; J; L; 3E; 3G; 3J; 3C; 3H; 3F; 3L; 3I
+17: C; E; F; G; H; I; J; K; 3E; 3G; 3J; 3C; 3H; 3F; 3I; 3K
+18: C; D; G; H; I; J; K; L; 3H; 3G; 3I; 3C; 3J; 3D; 3L; 3K
+19: C; D; F; H; I; J; K; L; 3C; 3J; 3I; 3D; 3H; 3F; 3L; 3K
+20: C; D; F; G; I; J; K; L; 3C; 3G; 3I; 3D; 3J; 3F; 3L; 3K
+21: C; D; F; G; H; J; K; L; 3C; 3G; 3J; 3D; 3H; 3F; 3L; 3K
+22: C; D; F; G; H; I; K; L; 3C; 3G; 3I; 3D; 3H; 3F; 3L; 3K
+23: C; D; F; G; H; I; J; L; 3C; 3G; 3J; 3D; 3H; 3F; 3L; 3I
+24: C; D; F; G; H; I; J; K; 3C; 3G; 3J; 3D; 3H; 3F; 3I; 3K
+25: C; D; E; H; I; J; K; L; 3E; 3J; 3I; 3C; 3H; 3D; 3L; 3K
+26: C; D; E; G; I; J; K; L; 3E; 3G; 3I; 3C; 3J; 3D; 3L; 3K
+27: C; D; E; G; H; J; K; L; 3E; 3G; 3J; 3C; 3H; 3D; 3L; 3K
+28: C; D; E; G; H; I; K; L; 3E; 3G; 3I; 3C; 3H; 3D; 3L; 3K
+29: C; D; E; G; H; I; J; L; 3E; 3G; 3J; 3C; 3H; 3D; 3L; 3I
+30: C; D; E; G; H; I; J; K; 3E; 3G; 3J; 3C; 3H; 3D; 3I; 3K
+31: C; D; E; F; I; J; K; L; 3C; 3J; 3E; 3D; 3I; 3F; 3L; 3K
+32: C; D; E; F; H; J; K; L; 3C; 3J; 3E; 3D; 3H; 3F; 3L; 3K
+33: C; D; E; F; H; I; K; L; 3C; 3E; 3I; 3D; 3H; 3F; 3L; 3K
+34: C; D; E; F; H; I; J; L; 3C; 3J; 3E; 3D; 3H; 3F; 3L; 3I
+35: C; D; E; F; H; I; J; K; 3C; 3J; 3E; 3D; 3H; 3F; 3I; 3K
+36: C; D; E; F; G; J; K; L; 3C; 3G; 3E; 3D; 3J; 3F; 3L; 3K
+37: C; D; E; F; G; I; K; L; 3C; 3G; 3E; 3D; 3I; 3F; 3L; 3K
+38: C; D; E; F; G; I; J; L; 3C; 3G; 3E; 3D; 3J; 3F; 3L; 3I
+39: C; D; E; F; G; I; J; K; 3C; 3G; 3E; 3D; 3J; 3F; 3I; 3K
+40: C; D; E; F; G; H; K; L; 3C; 3G; 3E; 3D; 3H; 3F; 3L; 3K
+41: C; D; E; F; G; H; J; L; 3C; 3G; 3J; 3D; 3H; 3F; 3L; 3E
+42: C; D; E; F; G; H; J; K; 3C; 3G; 3J; 3D; 3H; 3F; 3E; 3K
+43: C; D; E; F; G; H; I; L; 3C; 3G; 3E; 3D; 3H; 3F; 3L; 3I
+44: C; D; E; F; G; H; I; K; 3C; 3G; 3E; 3D; 3H; 3F; 3I; 3K
+45: C; D; E; F; G; H; I; J; 3C; 3G; 3J; 3D; 3H; 3F; 3E; 3I
+46: B; F; G; H; I; J; K; L; 3H; 3J; 3B; 3F; 3I; 3G; 3L; 3K
+47: B; E; G; H; I; J; K; L; 3E; 3J; 3I; 3B; 3H; 3G; 3L; 3K
+48: B; E; F; H; I; J; K; L; 3E; 3J; 3B; 3F; 3I; 3H; 3L; 3K
+49: B; E; F; G; I; J; K; L; 3E; 3J; 3B; 3F; 3I; 3G; 3L; 3K
+50: B; E; F; G; H; J; K; L; 3E; 3J; 3B; 3F; 3H; 3G; 3L; 3K
+51: B; E; F; G; H; I; K; L; 3E; 3G; 3B; 3F; 3I; 3H; 3L; 3K
+52: B; E; F; G; H; I; J; L; 3E; 3J; 3B; 3F; 3H; 3G; 3L; 3I
+53: B; E; F; G; H; I; J; K; 3E; 3J; 3B; 3F; 3H; 3G; 3I; 3K
+54: B; D; G; H; I; J; K; L; 3H; 3J; 3B; 3D; 3I; 3G; 3L; 3K
+55: B; D; F; H; I; J; K; L; 3H; 3J; 3B; 3D; 3I; 3F; 3L; 3K
+56: B; D; F; G; I; J; K; L; 3I; 3G; 3B; 3D; 3J; 3F; 3L; 3K
+57: B; D; F; G; H; J; K; L; 3H; 3G; 3B; 3D; 3J; 3F; 3L; 3K
+58: B; D; F; G; H; I; K; L; 3H; 3G; 3B; 3D; 3I; 3F; 3L; 3K
+59: B; D; F; G; H; I; J; L; 3H; 3G; 3B; 3D; 3J; 3F; 3L; 3I
+60: B; D; F; G; H; I; J; K; 3H; 3G; 3B; 3D; 3J; 3F; 3I; 3K
+61: B; D; E; H; I; J; K; L; 3E; 3J; 3B; 3D; 3I; 3H; 3L; 3K
+62: B; D; E; G; I; J; K; L; 3E; 3J; 3B; 3D; 3I; 3G; 3L; 3K
+63: B; D; E; G; H; J; K; L; 3E; 3J; 3B; 3D; 3H; 3G; 3L; 3K
+64: B; D; E; G; H; I; K; L; 3E; 3G; 3B; 3D; 3I; 3H; 3L; 3K
+65: B; D; E; G; H; I; J; L; 3E; 3J; 3B; 3D; 3H; 3G; 3L; 3I
+66: B; D; E; G; H; I; J; K; 3E; 3J; 3B; 3D; 3H; 3G; 3I; 3K
+67: B; D; E; F; I; J; K; L; 3E; 3J; 3B; 3D; 3I; 3F; 3L; 3K
+68: B; D; E; F; H; J; K; L; 3E; 3J; 3B; 3D; 3H; 3F; 3L; 3K
+69: B; D; E; F; H; I; K; L; 3E; 3I; 3B; 3D; 3H; 3F; 3L; 3K
+70: B; D; E; F; H; I; J; L; 3E; 3J; 3B; 3D; 3H; 3F; 3L; 3I
+71: B; D; E; F; H; I; J; K; 3E; 3J; 3B; 3D; 3H; 3F; 3I; 3K
+72: B; D; E; F; G; J; K; L; 3E; 3G; 3B; 3D; 3J; 3F; 3L; 3K
+73: B; D; E; F; G; I; K; L; 3E; 3G; 3B; 3D; 3I; 3F; 3L; 3K
+74: B; D; E; F; G; I; J; L; 3E; 3G; 3B; 3D; 3J; 3F; 3L; 3I
+75: B; D; E; F; G; I; J; K; 3E; 3G; 3B; 3D; 3J; 3F; 3I; 3K
+76: B; D; E; F; G; H; K; L; 3E; 3G; 3B; 3D; 3H; 3F; 3L; 3K
+77: B; D; E; F; G; H; J; L; 3H; 3G; 3B; 3D; 3J; 3F; 3L; 3E
+78: B; D; E; F; G; H; J; K; 3H; 3G; 3B; 3D; 3J; 3F; 3E; 3K
+79: B; D; E; F; G; H; I; L; 3E; 3G; 3B; 3D; 3H; 3F; 3L; 3I
+80: B; D; E; F; G; H; I; K; 3E; 3G; 3B; 3D; 3H; 3F; 3I; 3K
+81: B; D; E; F; G; H; I; J; 3H; 3G; 3B; 3D; 3J; 3F; 3E; 3I
+82: B; C; G; H; I; J; K; L; 3H; 3J; 3B; 3C; 3I; 3G; 3L; 3K
+83: B; C; F; H; I; J; K; L; 3H; 3J; 3B; 3C; 3I; 3F; 3L; 3K
+84: B; C; F; G; I; J; K; L; 3I; 3G; 3B; 3C; 3J; 3F; 3L; 3K
+85: B; C; F; G; H; J; K; L; 3H; 3G; 3B; 3C; 3J; 3F; 3L; 3K
+86: B; C; F; G; H; I; K; L; 3H; 3G; 3B; 3C; 3I; 3F; 3L; 3K
+87: B; C; F; G; H; I; J; L; 3H; 3G; 3B; 3C; 3J; 3F; 3L; 3I
+88: B; C; F; G; H; I; J; K; 3H; 3G; 3B; 3C; 3J; 3F; 3I; 3K
+89: B; C; E; H; I; J; K; L; 3E; 3J; 3B; 3C; 3I; 3H; 3L; 3K
+90: B; C; E; G; I; J; K; L; 3E; 3J; 3B; 3C; 3I; 3G; 3L; 3K
+91: B; C; E; G; H; J; K; L; 3E; 3J; 3B; 3C; 3H; 3G; 3L; 3K
+92: B; C; E; G; H; I; K; L; 3E; 3G; 3B; 3C; 3I; 3H; 3L; 3K
+93: B; C; E; G; H; I; J; L; 3E; 3J; 3B; 3C; 3H; 3G; 3L; 3I
+94: B; C; E; G; H; I; J; K; 3E; 3J; 3B; 3C; 3H; 3G; 3I; 3K
+95: B; C; E; F; I; J; K; L; 3E; 3J; 3B; 3C; 3I; 3F; 3L; 3K
+96: B; C; E; F; H; J; K; L; 3E; 3J; 3B; 3C; 3H; 3F; 3L; 3K
+97: B; C; E; F; H; I; K; L; 3E; 3I; 3B; 3C; 3H; 3F; 3L; 3K
+98: B; C; E; F; H; I; J; L; 3E; 3J; 3B; 3C; 3H; 3F; 3L; 3I
+99: B; C; E; F; H; I; J; K; 3E; 3J; 3B; 3C; 3H; 3F; 3I; 3K
+100: B; C; E; F; G; J; K; L; 3E; 3G; 3B; 3C; 3J; 3F; 3L; 3K
+101: B; C; E; F; G; I; K; L; 3E; 3G; 3B; 3C; 3I; 3F; 3L; 3K
+102: B; C; E; F; G; I; J; L; 3E; 3G; 3B; 3C; 3J; 3F; 3L; 3I
+103: B; C; E; F; G; I; J; K; 3E; 3G; 3B; 3C; 3J; 3F; 3I; 3K
+104: B; C; E; F; G; H; K; L; 3E; 3G; 3B; 3C; 3H; 3F; 3L; 3K
+105: B; C; E; F; G; H; J; L; 3H; 3G; 3B; 3C; 3J; 3F; 3L; 3E
+106: B; C; E; F; G; H; J; K; 3H; 3G; 3B; 3C; 3J; 3F; 3E; 3K
+107: B; C; E; F; G; H; I; L; 3E; 3G; 3B; 3C; 3H; 3F; 3L; 3I
+108: B; C; E; F; G; H; I; K; 3E; 3G; 3B; 3C; 3H; 3F; 3I; 3K
+109: B; C; E; F; G; H; I; J; 3H; 3G; 3B; 3C; 3J; 3F; 3E; 3I
+110: B; C; D; H; I; J; K; L; 3H; 3J; 3B; 3C; 3I; 3D; 3L; 3K
+111: B; C; D; G; I; J; K; L; 3I; 3G; 3B; 3C; 3J; 3D; 3L; 3K
+112: B; C; D; G; H; J; K; L; 3H; 3G; 3B; 3C; 3J; 3D; 3L; 3K
+113: B; C; D; G; H; I; K; L; 3H; 3G; 3B; 3C; 3I; 3D; 3L; 3K
+114: B; C; D; G; H; I; J; L; 3H; 3G; 3B; 3C; 3J; 3D; 3L; 3I
+115: B; C; D; G; H; I; J; K; 3H; 3G; 3B; 3C; 3J; 3D; 3I; 3K
+116: B; C; D; F; I; J; K; L; 3C; 3J; 3B; 3D; 3I; 3F; 3L; 3K
+117: B; C; D; F; H; J; K; L; 3C; 3J; 3B; 3D; 3H; 3F; 3L; 3K
+118: B; C; D; F; H; I; K; L; 3C; 3I; 3B; 3D; 3H; 3F; 3L; 3K
+119: B; C; D; F; H; I; J; L; 3C; 3J; 3B; 3D; 3H; 3F; 3L; 3I
+120: B; C; D; F; H; I; J; K; 3C; 3J; 3B; 3D; 3H; 3F; 3I; 3K
+121: B; C; D; F; G; J; K; L; 3C; 3G; 3B; 3D; 3J; 3F; 3L; 3K
+122: B; C; D; F; G; I; K; L; 3C; 3G; 3B; 3D; 3I; 3F; 3L; 3K
+123: B; C; D; F; G; I; J; L; 3C; 3G; 3B; 3D; 3J; 3F; 3L; 3I
+124: B; C; D; F; G; I; J; K; 3C; 3G; 3B; 3D; 3J; 3F; 3I; 3K
+125: B; C; D; F; G; H; K; L; 3C; 3G; 3B; 3D; 3H; 3F; 3L; 3K
+126: B; C; D; F; G; H; J; L; 3C; 3G; 3B; 3D; 3H; 3F; 3L; 3J
+127: B; C; D; F; G; H; J; K; 3H; 3G; 3B; 3C; 3J; 3F; 3D; 3K
+128: B; C; D; F; G; H; I; L; 3C; 3G; 3B; 3D; 3H; 3F; 3L; 3I
+129: B; C; D; F; G; H; I; K; 3C; 3G; 3B; 3D; 3H; 3F; 3I; 3K
+130: B; C; D; F; G; H; I; J; 3H; 3G; 3B; 3C; 3J; 3F; 3D; 3I
+131: B; C; D; E; I; J; K; L; 3E; 3J; 3B; 3C; 3I; 3D; 3L; 3K
+132: B; C; D; E; H; J; K; L; 3E; 3J; 3B; 3C; 3H; 3D; 3L; 3K
+133: B; C; D; E; H; I; K; L; 3E; 3I; 3B; 3C; 3H; 3D; 3L; 3K
+134: B; C; D; E; H; I; J; L; 3E; 3J; 3B; 3C; 3H; 3D; 3L; 3I
+135: B; C; D; E; H; I; J; K; 3E; 3J; 3B; 3C; 3H; 3D; 3I; 3K
+136: B; C; D; E; G; J; K; L; 3E; 3G; 3B; 3C; 3J; 3D; 3L; 3K
+137: B; C; D; E; G; I; K; L; 3E; 3G; 3B; 3C; 3I; 3D; 3L; 3K
+138: B; C; D; E; G; I; J; L; 3E; 3G; 3B; 3C; 3J; 3D; 3L; 3I
+139: B; C; D; E; G; I; J; K; 3E; 3G; 3B; 3C; 3J; 3D; 3I; 3K
+140: B; C; D; E; G; H; K; L; 3E; 3G; 3B; 3C; 3H; 3D; 3L; 3K
+141: B; C; D; E; G; H; J; L; 3H; 3G; 3B; 3C; 3J; 3D; 3L; 3E
+142: B; C; D; E; G; H; J; K; 3H; 3G; 3B; 3C; 3J; 3D; 3E; 3K
+143: B; C; D; E; G; H; I; L; 3E; 3G; 3B; 3C; 3H; 3D; 3L; 3I
+144: B; C; D; E; G; H; I; K; 3E; 3G; 3B; 3C; 3H; 3D; 3I; 3K
+145: B; C; D; E; G; H; I; J; 3H; 3G; 3B; 3C; 3J; 3D; 3E; 3I
+146: B; C; D; E; F; J; K; L; 3C; 3J; 3B; 3D; 3E; 3F; 3L; 3K
+147: B; C; D; E; F; I; K; L; 3C; 3E; 3B; 3D; 3I; 3F; 3L; 3K
+148: B; C; D; E; F; I; J; L; 3C; 3J; 3B; 3D; 3E; 3F; 3L; 3I
+149: B; C; D; E; F; I; J; K; 3C; 3J; 3B; 3D; 3E; 3F; 3I; 3K
+150: B; C; D; E; F; H; K; L; 3C; 3E; 3B; 3D; 3H; 3F; 3L; 3K
+151: B; C; D; E; F; H; J; L; 3C; 3J; 3B; 3D; 3H; 3F; 3L; 3E
+152: B; C; D; E; F; H; J; K; 3C; 3J; 3B; 3D; 3H; 3F; 3E; 3K
+153: B; C; D; E; F; H; I; L; 3C; 3E; 3B; 3D; 3H; 3F; 3L; 3I
+154: B; C; D; E; F; H; I; K; 3C; 3E; 3B; 3D; 3H; 3F; 3I; 3K
+155: B; C; D; E; F; H; I; J; 3C; 3J; 3B; 3D; 3H; 3F; 3E; 3I
+156: B; C; D; E; F; G; K; L; 3C; 3G; 3B; 3D; 3E; 3F; 3L; 3K
+157: B; C; D; E; F; G; J; L; 3C; 3G; 3B; 3D; 3J; 3F; 3L; 3E
+158: B; C; D; E; F; G; J; K; 3C; 3G; 3B; 3D; 3J; 3F; 3E; 3K
+159: B; C; D; E; F; G; I; L; 3C; 3G; 3B; 3D; 3E; 3F; 3L; 3I
+160: B; C; D; E; F; G; I; K; 3C; 3G; 3B; 3D; 3E; 3F; 3I; 3K
+161: B; C; D; E; F; G; I; J; 3C; 3G; 3B; 3D; 3J; 3F; 3E; 3I
+162: B; C; D; E; F; G; H; L; 3C; 3G; 3B; 3D; 3H; 3F; 3L; 3E
+163: B; C; D; E; F; G; H; K; 3C; 3G; 3B; 3D; 3H; 3F; 3E; 3K
+164: B; C; D; E; F; G; H; J; 3H; 3G; 3B; 3C; 3J; 3F; 3D; 3E
+165: B; C; D; E; F; G; H; I; 3C; 3G; 3B; 3D; 3H; 3F; 3E; 3I
+166: A; F; G; H; I; J; K; L; 3H; 3J; 3I; 3F; 3A; 3G; 3L; 3K
+167: A; E; G; H; I; J; K; L; 3E; 3J; 3I; 3A; 3H; 3G; 3L; 3K
+168: A; E; F; H; I; J; K; L; 3E; 3J; 3I; 3F; 3A; 3H; 3L; 3K
+169: A; E; F; G; I; J; K; L; 3E; 3J; 3I; 3F; 3A; 3G; 3L; 3K
+170: A; E; F; G; H; J; K; L; 3E; 3G; 3J; 3F; 3A; 3H; 3L; 3K
+171: A; E; F; G; H; I; K; L; 3E; 3G; 3I; 3F; 3A; 3H; 3L; 3K
+172: A; E; F; G; H; I; J; L; 3E; 3G; 3J; 3F; 3A; 3H; 3L; 3I
+173: A; E; F; G; H; I; J; K; 3E; 3G; 3J; 3F; 3A; 3H; 3I; 3K
+174: A; D; G; H; I; J; K; L; 3H; 3J; 3I; 3D; 3A; 3G; 3L; 3K
+175: A; D; F; H; I; J; K; L; 3H; 3J; 3I; 3D; 3A; 3F; 3L; 3K
+176: A; D; F; G; I; J; K; L; 3I; 3G; 3J; 3D; 3A; 3F; 3L; 3K
+177: A; D; F; G; H; J; K; L; 3H; 3G; 3J; 3D; 3A; 3F; 3L; 3K
+178: A; D; F; G; H; I; K; L; 3H; 3G; 3I; 3D; 3A; 3F; 3L; 3K
+179: A; D; F; G; H; I; J; L; 3H; 3G; 3J; 3D; 3A; 3F; 3L; 3I
+180: A; D; F; G; H; I; J; K; 3H; 3G; 3J; 3D; 3A; 3F; 3I; 3K
+181: A; D; E; H; I; J; K; L; 3E; 3J; 3I; 3D; 3A; 3H; 3L; 3K
+182: A; D; E; G; I; J; K; L; 3E; 3J; 3I; 3D; 3A; 3G; 3L; 3K
+183: A; D; E; G; H; J; K; L; 3E; 3G; 3J; 3D; 3A; 3H; 3L; 3K
+184: A; D; E; G; H; I; K; L; 3E; 3G; 3I; 3D; 3A; 3H; 3L; 3K
+185: A; D; E; G; H; I; J; L; 3E; 3G; 3J; 3D; 3A; 3H; 3L; 3I
+186: A; D; E; G; H; I; J; K; 3E; 3G; 3J; 3D; 3A; 3H; 3I; 3K
+187: A; D; E; F; I; J; K; L; 3E; 3J; 3I; 3D; 3A; 3F; 3L; 3K
+188: A; D; E; F; H; J; K; L; 3H; 3J; 3E; 3D; 3A; 3F; 3L; 3K
+189: A; D; E; F; H; I; K; L; 3H; 3E; 3I; 3D; 3A; 3F; 3L; 3K
+190: A; D; E; F; H; I; J; L; 3H; 3J; 3E; 3D; 3A; 3F; 3L; 3I
+191: A; D; E; F; H; I; J; K; 3H; 3J; 3E; 3D; 3A; 3F; 3I; 3K
+192: A; D; E; F; G; J; K; L; 3E; 3G; 3J; 3D; 3A; 3F; 3L; 3K
+193: A; D; E; F; G; I; K; L; 3E; 3G; 3I; 3D; 3A; 3F; 3L; 3K
+194: A; D; E; F; G; I; J; L; 3E; 3G; 3J; 3D; 3A; 3F; 3L; 3I
+195: A; D; E; F; G; I; J; K; 3E; 3G; 3J; 3D; 3A; 3F; 3I; 3K
+196: A; D; E; F; G; H; K; L; 3H; 3G; 3E; 3D; 3A; 3F; 3L; 3K
+197: A; D; E; F; G; H; J; L; 3H; 3G; 3J; 3D; 3A; 3F; 3L; 3E
+198: A; D; E; F; G; H; J; K; 3H; 3G; 3J; 3D; 3A; 3F; 3E; 3K
+199: A; D; E; F; G; H; I; L; 3H; 3G; 3E; 3D; 3A; 3F; 3L; 3I
+200: A; D; E; F; G; H; I; K; 3H; 3G; 3E; 3D; 3A; 3F; 3I; 3K
+201: A; D; E; F; G; H; I; J; 3H; 3G; 3J; 3D; 3A; 3F; 3E; 3I
+202: A; C; G; H; I; J; K; L; 3H; 3J; 3I; 3C; 3A; 3G; 3L; 3K
+203: A; C; F; H; I; J; K; L; 3H; 3J; 3I; 3C; 3A; 3F; 3L; 3K
+204: A; C; F; G; I; J; K; L; 3I; 3G; 3J; 3C; 3A; 3F; 3L; 3K
+205: A; C; F; G; H; J; K; L; 3H; 3G; 3J; 3C; 3A; 3F; 3L; 3K
+206: A; C; F; G; H; I; K; L; 3H; 3G; 3I; 3C; 3A; 3F; 3L; 3K
+207: A; C; F; G; H; I; J; L; 3H; 3G; 3J; 3C; 3A; 3F; 3L; 3I
+208: A; C; F; G; H; I; J; K; 3H; 3G; 3J; 3C; 3A; 3F; 3I; 3K
+209: A; C; E; H; I; J; K; L; 3E; 3J; 3I; 3C; 3A; 3H; 3L; 3K
+210: A; C; E; G; I; J; K; L; 3E; 3J; 3I; 3C; 3A; 3G; 3L; 3K
+211: A; C; E; G; H; J; K; L; 3E; 3G; 3J; 3C; 3A; 3H; 3L; 3K
+212: A; C; E; G; H; I; K; L; 3E; 3G; 3I; 3C; 3A; 3H; 3L; 3K
+213: A; C; E; G; H; I; J; L; 3E; 3G; 3J; 3C; 3A; 3H; 3L; 3I
+214: A; C; E; G; H; I; J; K; 3E; 3G; 3J; 3C; 3A; 3H; 3I; 3K
+215: A; C; E; F; I; J; K; L; 3E; 3J; 3I; 3C; 3A; 3F; 3L; 3K
+216: A; C; E; F; H; J; K; L; 3H; 3J; 3E; 3C; 3A; 3F; 3L; 3K
+217: A; C; E; F; H; I; K; L; 3H; 3E; 3I; 3C; 3A; 3F; 3L; 3K
+218: A; C; E; F; H; I; J; L; 3H; 3J; 3E; 3C; 3A; 3F; 3L; 3I
+219: A; C; E; F; H; I; J; K; 3H; 3J; 3E; 3C; 3A; 3F; 3I; 3K
+220: A; C; E; F; G; J; K; L; 3E; 3G; 3J; 3C; 3A; 3F; 3L; 3K
+221: A; C; E; F; G; I; K; L; 3E; 3G; 3I; 3C; 3A; 3F; 3L; 3K
+222: A; C; E; F; G; I; J; L; 3E; 3G; 3J; 3C; 3A; 3F; 3L; 3I
+223: A; C; E; F; G; I; J; K; 3E; 3G; 3J; 3C; 3A; 3F; 3I; 3K
+224: A; C; E; F; G; H; K; L; 3H; 3G; 3E; 3C; 3A; 3F; 3L; 3K
+225: A; C; E; F; G; H; J; L; 3H; 3G; 3J; 3C; 3A; 3F; 3L; 3E
+226: A; C; E; F; G; H; J; K; 3H; 3G; 3J; 3C; 3A; 3F; 3E; 3K
+227: A; C; E; F; G; H; I; L; 3H; 3G; 3E; 3C; 3A; 3F; 3L; 3I
+228: A; C; E; F; G; H; I; K; 3H; 3G; 3E; 3C; 3A; 3F; 3I; 3K
+229: A; C; E; F; G; H; I; J; 3H; 3G; 3J; 3C; 3A; 3F; 3E; 3I
+230: A; C; D; H; I; J; K; L; 3H; 3J; 3I; 3C; 3A; 3D; 3L; 3K
+231: A; C; D; G; I; J; K; L; 3I; 3G; 3J; 3C; 3A; 3D; 3L; 3K
+232: A; C; D; G; H; J; K; L; 3H; 3G; 3J; 3C; 3A; 3D; 3L; 3K
+233: A; C; D; G; H; I; K; L; 3H; 3G; 3I; 3C; 3A; 3D; 3L; 3K
+234: A; C; D; G; H; I; J; L; 3H; 3G; 3J; 3C; 3A; 3D; 3L; 3I
+235: A; C; D; G; H; I; J; K; 3H; 3G; 3J; 3C; 3A; 3D; 3I; 3K
+236: A; C; D; F; I; J; K; L; 3C; 3J; 3I; 3D; 3A; 3F; 3L; 3K
+237: A; C; D; F; H; J; K; L; 3H; 3J; 3F; 3C; 3A; 3D; 3L; 3K
+238: A; C; D; F; H; I; K; L; 3H; 3F; 3I; 3C; 3A; 3D; 3L; 3K
+239: A; C; D; F; H; I; J; L; 3H; 3J; 3F; 3C; 3A; 3D; 3L; 3I
+240: A; C; D; F; H; I; J; K; 3H; 3J; 3F; 3C; 3A; 3D; 3I; 3K
+241: A; C; D; F; G; J; K; L; 3C; 3G; 3J; 3D; 3A; 3F; 3L; 3K
+242: A; C; D; F; G; I; K; L; 3C; 3G; 3I; 3D; 3A; 3F; 3L; 3K
+243: A; C; D; F; G; I; J; L; 3C; 3G; 3J; 3D; 3A; 3F; 3L; 3I
+244: A; C; D; F; G; I; J; K; 3C; 3G; 3J; 3D; 3A; 3F; 3I; 3K
+245: A; C; D; F; G; H; K; L; 3H; 3G; 3F; 3C; 3A; 3D; 3L; 3K
+246: A; C; D; F; G; H; J; L; 3C; 3G; 3J; 3D; 3A; 3F; 3L; 3H
+247: A; C; D; F; G; H; J; K; 3H; 3G; 3J; 3C; 3A; 3F; 3D; 3K
+248: A; C; D; F; G; H; I; L; 3H; 3G; 3F; 3C; 3A; 3D; 3L; 3I
+249: A; C; D; F; G; H; I; K; 3H; 3G; 3F; 3C; 3A; 3D; 3I; 3K
+250: A; C; D; F; G; H; I; J; 3H; 3G; 3J; 3C; 3A; 3F; 3D; 3I
+251: A; C; D; E; I; J; K; L; 3E; 3J; 3I; 3C; 3A; 3D; 3L; 3K
+252: A; C; D; E; H; J; K; L; 3H; 3J; 3E; 3C; 3A; 3D; 3L; 3K
+253: A; C; D; E; H; I; K; L; 3H; 3E; 3I; 3C; 3A; 3D; 3L; 3K
+254: A; C; D; E; H; I; J; L; 3H; 3J; 3E; 3C; 3A; 3D; 3L; 3I
+255: A; C; D; E; H; I; J; K; 3H; 3J; 3E; 3C; 3A; 3D; 3I; 3K
+256: A; C; D; E; G; J; K; L; 3E; 3G; 3J; 3C; 3A; 3D; 3L; 3K
+257: A; C; D; E; G; I; K; L; 3E; 3G; 3I; 3C; 3A; 3D; 3L; 3K
+258: A; C; D; E; G; I; J; L; 3E; 3G; 3J; 3C; 3A; 3D; 3L; 3I
+259: A; C; D; E; G; I; J; K; 3E; 3G; 3J; 3C; 3A; 3D; 3I; 3K
+260: A; C; D; E; G; H; K; L; 3H; 3G; 3E; 3C; 3A; 3D; 3L; 3K
+261: A; C; D; E; G; H; J; L; 3H; 3G; 3J; 3C; 3A; 3D; 3L; 3E
+262: A; C; D; E; G; H; J; K; 3H; 3G; 3J; 3C; 3A; 3D; 3E; 3K
+263: A; C; D; E; G; H; I; L; 3H; 3G; 3E; 3C; 3A; 3D; 3L; 3I
+264: A; C; D; E; G; H; I; K; 3H; 3G; 3E; 3C; 3A; 3D; 3I; 3K
+265: A; C; D; E; G; H; I; J; 3H; 3G; 3J; 3C; 3A; 3D; 3E; 3I
+266: A; C; D; E; F; J; K; L; 3C; 3J; 3E; 3D; 3A; 3F; 3L; 3K
+267: A; C; D; E; F; I; K; L; 3C; 3E; 3I; 3D; 3A; 3F; 3L; 3K
+268: A; C; D; E; F; I; J; L; 3C; 3J; 3E; 3D; 3A; 3F; 3L; 3I
+269: A; C; D; E; F; I; J; K; 3C; 3J; 3E; 3D; 3A; 3F; 3I; 3K
+270: A; C; D; E; F; H; K; L; 3H; 3E; 3F; 3C; 3A; 3D; 3L; 3K
+271: A; C; D; E; F; H; J; L; 3H; 3J; 3F; 3C; 3A; 3D; 3L; 3E
+272: A; C; D; E; F; H; J; K; 3H; 3J; 3E; 3C; 3A; 3F; 3D; 3K
+273: A; C; D; E; F; H; I; L; 3H; 3E; 3F; 3C; 3A; 3D; 3L; 3I
+274: A; C; D; E; F; H; I; K; 3H; 3E; 3F; 3C; 3A; 3D; 3I; 3K
+275: A; C; D; E; F; H; I; J; 3H; 3J; 3E; 3C; 3A; 3F; 3D; 3I
+276: A; C; D; E; F; G; K; L; 3C; 3G; 3E; 3D; 3A; 3F; 3L; 3K
+277: A; C; D; E; F; G; J; L; 3C; 3G; 3J; 3D; 3A; 3F; 3L; 3E
+278: A; C; D; E; F; G; J; K; 3C; 3G; 3J; 3D; 3A; 3F; 3E; 3K
+279: A; C; D; E; F; G; I; L; 3C; 3G; 3E; 3D; 3A; 3F; 3L; 3I
+280: A; C; D; E; F; G; I; K; 3C; 3G; 3E; 3D; 3A; 3F; 3I; 3K
+281: A; C; D; E; F; G; I; J; 3C; 3G; 3J; 3D; 3A; 3F; 3E; 3I
+282: A; C; D; E; F; G; H; L; 3H; 3G; 3F; 3C; 3A; 3D; 3L; 3E
+283: A; C; D; E; F; G; H; K; 3H; 3G; 3E; 3C; 3A; 3F; 3D; 3K
+284: A; C; D; E; F; G; H; J; 3H; 3G; 3J; 3C; 3A; 3F; 3D; 3E
+285: A; C; D; E; F; G; H; I; 3H; 3G; 3E; 3C; 3A; 3F; 3D; 3I
+286: A; B; G; H; I; J; K; L; 3H; 3J; 3B; 3A; 3I; 3G; 3L; 3K
+287: A; B; F; H; I; J; K; L; 3H; 3J; 3B; 3A; 3I; 3F; 3L; 3K
+288: A; B; F; G; I; J; K; L; 3I; 3J; 3B; 3F; 3A; 3G; 3L; 3K
+289: A; B; F; G; H; J; K; L; 3H; 3J; 3B; 3F; 3A; 3G; 3L; 3K
+290: A; B; F; G; H; I; K; L; 3H; 3G; 3B; 3A; 3I; 3F; 3L; 3K
+291: A; B; F; G; H; I; J; L; 3H; 3J; 3B; 3F; 3A; 3G; 3L; 3I
+292: A; B; F; G; H; I; J; K; 3H; 3J; 3B; 3F; 3A; 3G; 3I; 3K
+293: A; B; E; H; I; J; K; L; 3E; 3J; 3B; 3A; 3I; 3H; 3L; 3K
+294: A; B; E; G; I; J; K; L; 3E; 3J; 3B; 3A; 3I; 3G; 3L; 3K
+295: A; B; E; G; H; J; K; L; 3E; 3J; 3B; 3A; 3H; 3G; 3L; 3K
+296: A; B; E; G; H; I; K; L; 3E; 3G; 3B; 3A; 3I; 3H; 3L; 3K
+297: A; B; E; G; H; I; J; L; 3E; 3J; 3B; 3A; 3H; 3G; 3L; 3I
+298: A; B; E; G; H; I; J; K; 3E; 3J; 3B; 3A; 3H; 3G; 3I; 3K
+299: A; B; E; F; I; J; K; L; 3E; 3J; 3B; 3A; 3I; 3F; 3L; 3K
+300: A; B; E; F; H; J; K; L; 3E; 3J; 3B; 3F; 3A; 3H; 3L; 3K
+301: A; B; E; F; H; I; K; L; 3E; 3I; 3B; 3F; 3A; 3H; 3L; 3K
+302: A; B; E; F; H; I; J; L; 3E; 3J; 3B; 3F; 3A; 3H; 3L; 3I
+303: A; B; E; F; H; I; J; K; 3E; 3J; 3B; 3F; 3A; 3H; 3I; 3K
+304: A; B; E; F; G; J; K; L; 3E; 3J; 3B; 3F; 3A; 3G; 3L; 3K
+305: A; B; E; F; G; I; K; L; 3E; 3G; 3B; 3A; 3I; 3F; 3L; 3K
+306: A; B; E; F; G; I; J; L; 3E; 3J; 3B; 3F; 3A; 3G; 3L; 3I
+307: A; B; E; F; G; I; J; K; 3E; 3J; 3B; 3F; 3A; 3G; 3I; 3K
+308: A; B; E; F; G; H; K; L; 3E; 3G; 3B; 3F; 3A; 3H; 3L; 3K
+309: A; B; E; F; G; H; J; L; 3H; 3J; 3B; 3F; 3A; 3G; 3L; 3E
+310: A; B; E; F; G; H; J; K; 3H; 3J; 3B; 3F; 3A; 3G; 3E; 3K
+311: A; B; E; F; G; H; I; L; 3E; 3G; 3B; 3F; 3A; 3H; 3L; 3I
+312: A; B; E; F; G; H; I; K; 3E; 3G; 3B; 3F; 3A; 3H; 3I; 3K
+313: A; B; E; F; G; H; I; J; 3H; 3J; 3B; 3F; 3A; 3G; 3E; 3I
+314: A; B; D; H; I; J; K; L; 3I; 3J; 3B; 3D; 3A; 3H; 3L; 3K
+315: A; B; D; G; I; J; K; L; 3I; 3J; 3B; 3D; 3A; 3G; 3L; 3K
+316: A; B; D; G; H; J; K; L; 3H; 3J; 3B; 3D; 3A; 3G; 3L; 3K
+317: A; B; D; G; H; I; K; L; 3I; 3G; 3B; 3D; 3A; 3H; 3L; 3K
+318: A; B; D; G; H; I; J; L; 3H; 3J; 3B; 3D; 3A; 3G; 3L; 3I
+319: A; B; D; G; H; I; J; K; 3H; 3J; 3B; 3D; 3A; 3G; 3I; 3K
+320: A; B; D; F; I; J; K; L; 3I; 3J; 3B; 3D; 3A; 3F; 3L; 3K
+321: A; B; D; F; H; J; K; L; 3H; 3J; 3B; 3D; 3A; 3F; 3L; 3K
+322: A; B; D; F; H; I; K; L; 3H; 3I; 3B; 3D; 3A; 3F; 3L; 3K
+323: A; B; D; F; H; I; J; L; 3H; 3J; 3B; 3D; 3A; 3F; 3L; 3I
+324: A; B; D; F; H; I; J; K; 3H; 3J; 3B; 3D; 3A; 3F; 3I; 3K
+325: A; B; D; F; G; J; K; L; 3F; 3J; 3B; 3D; 3A; 3G; 3L; 3K
+326: A; B; D; F; G; I; K; L; 3I; 3G; 3B; 3D; 3A; 3F; 3L; 3K
+327: A; B; D; F; G; I; J; L; 3F; 3J; 3B; 3D; 3A; 3G; 3L; 3I
+328: A; B; D; F; G; I; J; K; 3F; 3J; 3B; 3D; 3A; 3G; 3I; 3K
+329: A; B; D; F; G; H; K; L; 3H; 3G; 3B; 3D; 3A; 3F; 3L; 3K
+330: A; B; D; F; G; H; J; L; 3H; 3G; 3B; 3D; 3A; 3F; 3L; 3J
+331: A; B; D; F; G; H; J; K; 3H; 3G; 3B; 3D; 3A; 3F; 3J; 3K
+332: A; B; D; F; G; H; I; L; 3H; 3G; 3B; 3D; 3A; 3F; 3L; 3I
+333: A; B; D; F; G; H; I; K; 3H; 3G; 3B; 3D; 3A; 3F; 3I; 3K
+334: A; B; D; F; G; H; I; J; 3H; 3G; 3B; 3D; 3A; 3F; 3I; 3J
+335: A; B; D; E; I; J; K; L; 3E; 3J; 3B; 3A; 3I; 3D; 3L; 3K
+336: A; B; D; E; H; J; K; L; 3E; 3J; 3B; 3D; 3A; 3H; 3L; 3K
+337: A; B; D; E; H; I; K; L; 3E; 3I; 3B; 3D; 3A; 3H; 3L; 3K
+338: A; B; D; E; H; I; J; L; 3E; 3J; 3B; 3D; 3A; 3H; 3L; 3I
+339: A; B; D; E; H; I; J; K; 3E; 3J; 3B; 3D; 3A; 3H; 3I; 3K
+340: A; B; D; E; G; J; K; L; 3E; 3J; 3B; 3D; 3A; 3G; 3L; 3K
+341: A; B; D; E; G; I; K; L; 3E; 3G; 3B; 3A; 3I; 3D; 3L; 3K
+342: A; B; D; E; G; I; J; L; 3E; 3J; 3B; 3D; 3A; 3G; 3L; 3I
+343: A; B; D; E; G; I; J; K; 3E; 3J; 3B; 3D; 3A; 3G; 3I; 3K
+344: A; B; D; E; G; H; K; L; 3E; 3G; 3B; 3D; 3A; 3H; 3L; 3K
+345: A; B; D; E; G; H; J; L; 3H; 3J; 3B; 3D; 3A; 3G; 3L; 3E
+346: A; B; D; E; G; H; J; K; 3H; 3J; 3B; 3D; 3A; 3G; 3E; 3K
+347: A; B; D; E; G; H; I; L; 3E; 3G; 3B; 3D; 3A; 3H; 3L; 3I
+348: A; B; D; E; G; H; I; K; 3E; 3G; 3B; 3D; 3A; 3H; 3I; 3K
+349: A; B; D; E; G; H; I; J; 3H; 3J; 3B; 3D; 3A; 3G; 3E; 3I
+350: A; B; D; E; F; J; K; L; 3E; 3J; 3B; 3D; 3A; 3F; 3L; 3K
+351: A; B; D; E; F; I; K; L; 3E; 3I; 3B; 3D; 3A; 3F; 3L; 3K
+352: A; B; D; E; F; I; J; L; 3E; 3J; 3B; 3D; 3A; 3F; 3L; 3I
+353: A; B; D; E; F; I; J; K; 3E; 3J; 3B; 3D; 3A; 3F; 3I; 3K
+354: A; B; D; E; F; H; K; L; 3H; 3E; 3B; 3D; 3A; 3F; 3L; 3K
+355: A; B; D; E; F; H; J; L; 3H; 3J; 3B; 3D; 3A; 3F; 3L; 3E
+356: A; B; D; E; F; H; J; K; 3H; 3J; 3B; 3D; 3A; 3F; 3E; 3K
+357: A; B; D; E; F; H; I; L; 3H; 3E; 3B; 3D; 3A; 3F; 3L; 3I
+358: A; B; D; E; F; H; I; K; 3H; 3E; 3B; 3D; 3A; 3F; 3I; 3K
+359: A; B; D; E; F; H; I; J; 3H; 3J; 3B; 3D; 3A; 3F; 3E; 3I
+360: A; B; D; E; F; G; K; L; 3E; 3G; 3B; 3D; 3A; 3F; 3L; 3K
+361: A; B; D; E; F; G; J; L; 3E; 3G; 3B; 3D; 3A; 3F; 3L; 3J
+362: A; B; D; E; F; G; J; K; 3E; 3G; 3B; 3D; 3A; 3F; 3J; 3K
+363: A; B; D; E; F; G; I; L; 3E; 3G; 3B; 3D; 3A; 3F; 3L; 3I
+364: A; B; D; E; F; G; I; K; 3E; 3G; 3B; 3D; 3A; 3F; 3I; 3K
+365: A; B; D; E; F; G; I; J; 3E; 3G; 3B; 3D; 3A; 3F; 3I; 3J
+366: A; B; D; E; F; G; H; L; 3H; 3G; 3B; 3D; 3A; 3F; 3L; 3E
+367: A; B; D; E; F; G; H; K; 3H; 3G; 3B; 3D; 3A; 3F; 3E; 3K
+368: A; B; D; E; F; G; H; J; 3H; 3G; 3B; 3D; 3A; 3F; 3E; 3J
+369: A; B; D; E; F; G; H; I; 3H; 3G; 3B; 3D; 3A; 3F; 3E; 3I
+370: A; B; C; H; I; J; K; L; 3I; 3J; 3B; 3C; 3A; 3H; 3L; 3K
+371: A; B; C; G; I; J; K; L; 3I; 3J; 3B; 3C; 3A; 3G; 3L; 3K
+372: A; B; C; G; H; J; K; L; 3H; 3J; 3B; 3C; 3A; 3G; 3L; 3K
+373: A; B; C; G; H; I; K; L; 3I; 3G; 3B; 3C; 3A; 3H; 3L; 3K
+374: A; B; C; G; H; I; J; L; 3H; 3J; 3B; 3C; 3A; 3G; 3L; 3I
+375: A; B; C; G; H; I; J; K; 3H; 3J; 3B; 3C; 3A; 3G; 3I; 3K
+376: A; B; C; F; I; J; K; L; 3I; 3J; 3B; 3C; 3A; 3F; 3L; 3K
+377: A; B; C; F; H; J; K; L; 3H; 3J; 3B; 3C; 3A; 3F; 3L; 3K
+378: A; B; C; F; H; I; K; L; 3H; 3I; 3B; 3C; 3A; 3F; 3L; 3K
+379: A; B; C; F; H; I; J; L; 3H; 3J; 3B; 3C; 3A; 3F; 3L; 3I
+380: A; B; C; F; H; I; J; K; 3H; 3J; 3B; 3C; 3A; 3F; 3I; 3K
+381: A; B; C; F; G; J; K; L; 3C; 3J; 3B; 3F; 3A; 3G; 3L; 3K
+382: A; B; C; F; G; I; K; L; 3I; 3G; 3B; 3C; 3A; 3F; 3L; 3K
+383: A; B; C; F; G; I; J; L; 3C; 3J; 3B; 3F; 3A; 3G; 3L; 3I
+384: A; B; C; F; G; I; J; K; 3C; 3J; 3B; 3F; 3A; 3G; 3I; 3K
+385: A; B; C; F; G; H; K; L; 3H; 3G; 3B; 3C; 3A; 3F; 3L; 3K
+386: A; B; C; F; G; H; J; L; 3H; 3G; 3B; 3C; 3A; 3F; 3L; 3J
+387: A; B; C; F; G; H; J; K; 3H; 3G; 3B; 3C; 3A; 3F; 3J; 3K
+388: A; B; C; F; G; H; I; L; 3H; 3G; 3B; 3C; 3A; 3F; 3L; 3I
+389: A; B; C; F; G; H; I; K; 3H; 3G; 3B; 3C; 3A; 3F; 3I; 3K
+390: A; B; C; F; G; H; I; J; 3H; 3G; 3B; 3C; 3A; 3F; 3I; 3J
+391: A; B; C; E; I; J; K; L; 3E; 3J; 3B; 3A; 3I; 3C; 3L; 3K
+392: A; B; C; E; H; J; K; L; 3E; 3J; 3B; 3C; 3A; 3H; 3L; 3K
+393: A; B; C; E; H; I; K; L; 3E; 3I; 3B; 3C; 3A; 3H; 3L; 3K
+394: A; B; C; E; H; I; J; L; 3E; 3J; 3B; 3C; 3A; 3H; 3L; 3I
+395: A; B; C; E; H; I; J; K; 3E; 3J; 3B; 3C; 3A; 3H; 3I; 3K
+396: A; B; C; E; G; J; K; L; 3E; 3J; 3B; 3C; 3A; 3G; 3L; 3K
+397: A; B; C; E; G; I; K; L; 3E; 3G; 3B; 3A; 3I; 3C; 3L; 3K
+398: A; B; C; E; G; I; J; L; 3E; 3J; 3B; 3C; 3A; 3G; 3L; 3I
+399: A; B; C; E; G; I; J; K; 3E; 3J; 3B; 3C; 3A; 3G; 3I; 3K
+400: A; B; C; E; G; H; K; L; 3E; 3G; 3B; 3C; 3A; 3H; 3L; 3K
+401: A; B; C; E; G; H; J; L; 3H; 3J; 3B; 3C; 3A; 3G; 3L; 3E
+402: A; B; C; E; G; H; J; K; 3H; 3J; 3B; 3C; 3A; 3G; 3E; 3K
+403: A; B; C; E; G; H; I; L; 3E; 3G; 3B; 3C; 3A; 3H; 3L; 3I
+404: A; B; C; E; G; H; I; K; 3E; 3G; 3B; 3C; 3A; 3H; 3I; 3K
+405: A; B; C; E; G; H; I; J; 3H; 3J; 3B; 3C; 3A; 3G; 3E; 3I
+406: A; B; C; E; F; J; K; L; 3E; 3J; 3B; 3C; 3A; 3F; 3L; 3K
+407: A; B; C; E; F; I; K; L; 3E; 3I; 3B; 3C; 3A; 3F; 3L; 3K
+408: A; B; C; E; F; I; J; L; 3E; 3J; 3B; 3C; 3A; 3F; 3L; 3I
+409: A; B; C; E; F; I; J; K; 3E; 3J; 3B; 3C; 3A; 3F; 3I; 3K
+410: A; B; C; E; F; H; K; L; 3H; 3E; 3B; 3C; 3A; 3F; 3L; 3K
+411: A; B; C; E; F; H; J; L; 3H; 3J; 3B; 3C; 3A; 3F; 3L; 3E
+412: A; B; C; E; F; H; J; K; 3H; 3J; 3B; 3C; 3A; 3F; 3E; 3K
+413: A; B; C; E; F; H; I; L; 3H; 3E; 3B; 3C; 3A; 3F; 3L; 3I
+414: A; B; C; E; F; H; I; K; 3H; 3E; 3B; 3C; 3A; 3F; 3I; 3K
+415: A; B; C; E; F; H; I; J; 3H; 3J; 3B; 3C; 3A; 3F; 3E; 3I
+416: A; B; C; E; F; G; K; L; 3E; 3G; 3B; 3C; 3A; 3F; 3L; 3K
+417: A; B; C; E; F; G; J; L; 3E; 3G; 3B; 3C; 3A; 3F; 3L; 3J
+418: A; B; C; E; F; G; J; K; 3E; 3G; 3B; 3C; 3A; 3F; 3J; 3K
+419: A; B; C; E; F; G; I; L; 3E; 3G; 3B; 3C; 3A; 3F; 3L; 3I
+420: A; B; C; E; F; G; I; K; 3E; 3G; 3B; 3C; 3A; 3F; 3I; 3K
+421: A; B; C; E; F; G; I; J; 3E; 3G; 3B; 3C; 3A; 3F; 3I; 3J
+422: A; B; C; E; F; G; H; L; 3H; 3G; 3B; 3C; 3A; 3F; 3L; 3E
+423: A; B; C; E; F; G; H; K; 3H; 3G; 3B; 3C; 3A; 3F; 3E; 3K
+424: A; B; C; E; F; G; H; J; 3H; 3G; 3B; 3C; 3A; 3F; 3E; 3J
+425: A; B; C; E; F; G; H; I; 3H; 3G; 3B; 3C; 3A; 3F; 3E; 3I
+426: A; B; C; D; I; J; K; L; 3I; 3J; 3B; 3C; 3A; 3D; 3L; 3K
+427: A; B; C; D; H; J; K; L; 3H; 3J; 3B; 3C; 3A; 3D; 3L; 3K
+428: A; B; C; D; H; I; K; L; 3H; 3I; 3B; 3C; 3A; 3D; 3L; 3K
+429: A; B; C; D; H; I; J; L; 3H; 3J; 3B; 3C; 3A; 3D; 3L; 3I
+430: A; B; C; D; H; I; J; K; 3H; 3J; 3B; 3C; 3A; 3D; 3I; 3K
+431: A; B; C; D; G; J; K; L; 3C; 3J; 3B; 3D; 3A; 3G; 3L; 3K
+432: A; B; C; D; G; I; K; L; 3I; 3G; 3B; 3C; 3A; 3D; 3L; 3K
+433: A; B; C; D; G; I; J; L; 3C; 3J; 3B; 3D; 3A; 3G; 3L; 3I
+434: A; B; C; D; G; I; J; K; 3C; 3J; 3B; 3D; 3A; 3G; 3I; 3K
+435: A; B; C; D; G; H; K; L; 3H; 3G; 3B; 3C; 3A; 3D; 3L; 3K
+436: A; B; C; D; G; H; J; L; 3H; 3G; 3B; 3C; 3A; 3D; 3L; 3J
+437: A; B; C; D; G; H; J; K; 3H; 3G; 3B; 3C; 3A; 3D; 3J; 3K
+438: A; B; C; D; G; H; I; L; 3H; 3G; 3B; 3C; 3A; 3D; 3L; 3I
+439: A; B; C; D; G; H; I; K; 3H; 3G; 3B; 3C; 3A; 3D; 3I; 3K
+440: A; B; C; D; G; H; I; J; 3H; 3G; 3B; 3C; 3A; 3D; 3I; 3J
+441: A; B; C; D; F; J; K; L; 3C; 3J; 3B; 3D; 3A; 3F; 3L; 3K
+442: A; B; C; D; F; I; K; L; 3C; 3I; 3B; 3D; 3A; 3F; 3L; 3K
+443: A; B; C; D; F; I; J; L; 3C; 3J; 3B; 3D; 3A; 3F; 3L; 3I
+444: A; B; C; D; F; I; J; K; 3C; 3J; 3B; 3D; 3A; 3F; 3I; 3K
+445: A; B; C; D; F; H; K; L; 3H; 3F; 3B; 3C; 3A; 3D; 3L; 3K
+446: A; B; C; D; F; H; J; L; 3C; 3J; 3B; 3D; 3A; 3F; 3L; 3H
+447: A; B; C; D; F; H; J; K; 3H; 3J; 3B; 3C; 3A; 3F; 3D; 3K
+448: A; B; C; D; F; H; I; L; 3H; 3F; 3B; 3C; 3A; 3D; 3L; 3I
+449: A; B; C; D; F; H; I; K; 3H; 3F; 3B; 3C; 3A; 3D; 3I; 3K
+450: A; B; C; D; F; H; I; J; 3H; 3J; 3B; 3C; 3A; 3F; 3D; 3I
+451: A; B; C; D; F; G; K; L; 3C; 3G; 3B; 3D; 3A; 3F; 3L; 3K
+452: A; B; C; D; F; G; J; L; 3C; 3G; 3B; 3D; 3A; 3F; 3L; 3J
+453: A; B; C; D; F; G; J; K; 3C; 3G; 3B; 3D; 3A; 3F; 3J; 3K
+454: A; B; C; D; F; G; I; L; 3C; 3G; 3B; 3D; 3A; 3F; 3L; 3I
+455: A; B; C; D; F; G; I; K; 3C; 3G; 3B; 3D; 3A; 3F; 3I; 3K
+456: A; B; C; D; F; G; I; J; 3C; 3G; 3B; 3D; 3A; 3F; 3I; 3J
+457: A; B; C; D; F; G; H; L; 3C; 3G; 3B; 3D; 3A; 3F; 3L; 3H
+458: A; B; C; D; F; G; H; K; 3H; 3G; 3B; 3C; 3A; 3F; 3D; 3K
+459: A; B; C; D; F; G; H; J; 3H; 3G; 3B; 3C; 3A; 3F; 3D; 3J
+460: A; B; C; D; F; G; H; I; 3H; 3G; 3B; 3C; 3A; 3F; 3D; 3I
+461: A; B; C; D; E; J; K; L; 3E; 3J; 3B; 3C; 3A; 3D; 3L; 3K
+462: A; B; C; D; E; I; K; L; 3E; 3I; 3B; 3C; 3A; 3D; 3L; 3K
+463: A; B; C; D; E; I; J; L; 3E; 3J; 3B; 3C; 3A; 3D; 3L; 3I
+464: A; B; C; D; E; I; J; K; 3E; 3J; 3B; 3C; 3A; 3D; 3I; 3K
+465: A; B; C; D; E; H; K; L; 3H; 3E; 3B; 3C; 3A; 3D; 3L; 3K
+466: A; B; C; D; E; H; J; L; 3H; 3J; 3B; 3C; 3A; 3D; 3L; 3E
+467: A; B; C; D; E; H; J; K; 3H; 3J; 3B; 3C; 3A; 3D; 3E; 3K
+468: A; B; C; D; E; H; I; L; 3H; 3E; 3B; 3C; 3A; 3D; 3L; 3I
+469: A; B; C; D; E; H; I; K; 3H; 3E; 3B; 3C; 3A; 3D; 3I; 3K
+470: A; B; C; D; E; H; I; J; 3H; 3J; 3B; 3C; 3A; 3D; 3E; 3I
+471: A; B; C; D; E; G; K; L; 3E; 3G; 3B; 3C; 3A; 3D; 3L; 3K
+472: A; B; C; D; E; G; J; L; 3E; 3G; 3B; 3C; 3A; 3D; 3L; 3J
+473: A; B; C; D; E; G; J; K; 3E; 3G; 3B; 3C; 3A; 3D; 3J; 3K
+474: A; B; C; D; E; G; I; L; 3E; 3G; 3B; 3C; 3A; 3D; 3L; 3I
+475: A; B; C; D; E; G; I; K; 3E; 3G; 3B; 3C; 3A; 3D; 3I; 3K
+476: A; B; C; D; E; G; I; J; 3E; 3G; 3B; 3C; 3A; 3D; 3I; 3J
+477: A; B; C; D; E; G; H; L; 3H; 3G; 3B; 3C; 3A; 3D; 3L; 3E
+478: A; B; C; D; E; G; H; K; 3H; 3G; 3B; 3C; 3A; 3D; 3E; 3K
+479: A; B; C; D; E; G; H; J; 3H; 3G; 3B; 3C; 3A; 3D; 3E; 3J
+480: A; B; C; D; E; G; H; I; 3H; 3G; 3B; 3C; 3A; 3D; 3E; 3I
+481: A; B; C; D; E; F; K; L; 3C; 3E; 3B; 3D; 3A; 3F; 3L; 3K
+482: A; B; C; D; E; F; J; L; 3C; 3J; 3B; 3D; 3A; 3F; 3L; 3E
+483: A; B; C; D; E; F; J; K; 3C; 3J; 3B; 3D; 3A; 3F; 3E; 3K
+484: A; B; C; D; E; F; I; L; 3C; 3E; 3B; 3D; 3A; 3F; 3L; 3I
+485: A; B; C; D; E; F; I; K; 3C; 3E; 3B; 3D; 3A; 3F; 3I; 3K
+486: A; B; C; D; E; F; I; J; 3C; 3J; 3B; 3D; 3A; 3F; 3E; 3I
+487: A; B; C; D; E; F; H; L; 3H; 3F; 3B; 3C; 3A; 3D; 3L; 3E
+488: A; B; C; D; E; F; H; K; 3H; 3E; 3B; 3C; 3A; 3F; 3D; 3K
+489: A; B; C; D; E; F; H; J; 3H; 3J; 3B; 3C; 3A; 3F; 3D; 3E
+490: A; B; C; D; E; F; H; I; 3H; 3E; 3B; 3C; 3A; 3F; 3D; 3I
+491: A; B; C; D; E; F; G; L; 3C; 3G; 3B; 3D; 3A; 3F; 3L; 3E
+492: A; B; C; D; E; F; G; K; 3C; 3G; 3B; 3D; 3A; 3F; 3E; 3K
+493: A; B; C; D; E; F; G; J; 3C; 3G; 3B; 3D; 3A; 3F; 3E; 3J
+494: A; B; C; D; E; F; G; I; 3C; 3G; 3B; 3D; 3A; 3F; 3E; 3I
+495: A; B; C; D; E; F; G; H; 3H; 3G; 3B; 3C; 3A; 3F; 3D; 3E
+`;
+const ANNEX_COLS = ['A','B','D','E','G','I','K','L'];
+const ANNEX_C = ANNEX_C_RAW.trim().split('\n').map(line => {
+  const parts = line.split(':')[1].split(';').map(s => s.trim());
+  const groups = parts.slice(0, 8);
+  const values = parts.slice(8, 16).map(s => s.replace('3', ''));
+  const map = {};
+  ANNEX_COLS.forEach((c, i) => map[c] = values[i]);
+  return { groups: new Set(groups), map };
+});
+function findAnnexRow(qualSet){
+  return ANNEX_C.find(row =>
+    row.groups.size === qualSet.size && [...qualSet].every(g => row.groups.has(g))
+  );
+}
 
 function computeStandings(group){
   const stats = {};
@@ -278,8 +827,6 @@ function rowClass(idx, group, qualifiedGroups){
   return 'r-red';
 }
 
-// Build each group card once, including the score inputs. These never get
-// destroyed afterwards, so typing in a box doesn't lose focus.
 function buildGroupShells(){
   const el = document.getElementById('groups');
   el.innerHTML = '';
@@ -287,7 +834,6 @@ function buildGroupShells(){
     const group = GROUPS[g];
     const card = document.createElement('div');
     card.className = 'card';
-
     let fixtures = group.matches.map((m, idx) => `
       <div class="matchrow">
         <span class="side home">${m.h}</span>
@@ -297,7 +843,6 @@ function buildGroupShells(){
         <span class="side away">${m.a}</span>
         <span class="date">${m.d}</span>
       </div>`).join('');
-
     card.innerHTML = `
       <h3>Group ${g}</h3>
       <table class="standings">
@@ -308,8 +853,6 @@ function buildGroupShells(){
     `;
     el.appendChild(card);
   });
-
-  // One delegated listener for every score box, attached once.
   el.addEventListener('input', e => {
     const t = e.target;
     if (t.tagName !== 'INPUT') return;
@@ -319,8 +862,8 @@ function buildGroupShells(){
   });
 }
 
-// Recomputes standings/third-place/bracket and updates only those sections —
-// the input fields themselves are left alone.
+const picks = {};
+
 function refreshComputed(){
   const allStandings = {};
   Object.keys(GROUPS).forEach(g => allStandings[g] = computeStandings(GROUPS[g]));
@@ -328,6 +871,7 @@ function refreshComputed(){
   let thirdPool = Object.keys(GROUPS).map(g => ({...allStandings[g][2], group:g}));
   thirdPool.sort((x,y)=> y.pts-x.pts || y.gd-x.gd || y.gf-x.gf);
   const qualifiedGroups = new Set(thirdPool.slice(0,8).map(t=>t.group));
+  const annexRow = findAnnexRow(qualifiedGroups);
 
   Object.keys(GROUPS).forEach(g => {
     const tbody = document.getElementById(`stbody-${g}`);
@@ -341,7 +885,7 @@ function refreshComputed(){
   });
 
   renderThirdTable(thirdPool, qualifiedGroups);
-  renderR32(allStandings, thirdPool, qualifiedGroups);
+  renderBracket(allStandings, annexRow);
 }
 
 function renderThirdTable(thirdPool, qualifiedGroups){
@@ -360,38 +904,97 @@ function renderThirdTable(thirdPool, qualifiedGroups){
   el.innerHTML = head + rows;
 }
 
-function renderR32(allStandings, thirdPool, qualifiedGroups){
-  const el = document.getElementById('r32');
-  el.innerHTML = '';
+function escapeAttr(s){
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderBracket(allStandings, annexRow){
+  const results = {};
 
   R32_DET.forEach(m => {
-    const t1 = allStandings[m.g1][m.p1];
-    const t2 = allStandings[m.g2][m.p2];
-    const label1 = m.p1===0 ? `Group ${m.g1} winner` : `Group ${m.g1} runner-up`;
-    const label2 = m.p2===0 ? `Group ${m.g2} winner` : `Group ${m.g2} runner-up`;
-    el.appendChild(matchCard(m.date, m.city, t1.team, t2.team, label1, label2));
+    const t1 = allStandings[m.g1][m.p1].team;
+    const t2 = allStandings[m.g2][m.p2].team;
+    results[m.id] = {team1:t1, team2:t2, date:m.date, city:m.city, round:'Round of 32'};
+  });
+  R32_THIRD.forEach(m => {
+    const t1 = allStandings[m.g][0].team;
+    const thirdGroup = annexRow ? annexRow.map[m.g] : null;
+    const t2 = thirdGroup ? allStandings[thirdGroup][2].team : null;
+    results[m.id] = {team1:t1, team2:t2, date:m.date, city:m.city, round:'Round of 32'};
   });
 
-  R32_THIRD.forEach(m => {
-    const t1 = allStandings[m.g][0];
-    el.appendChild(matchCard(m.date, m.city, t1.team, 'Best 3rd-place team', `Group ${m.g} winner`, 'TBD — set once groups finish', true));
+  function resolve(slot){
+    const match = results[slot.id];
+    const pick = picks[slot.id];
+    const field = slot.type === 'winnerOf' ? 'winner' : 'loser';
+    if (pick && match && (pick[field] === match.team1 || pick[field] === match.team2)) {
+      return pick[field];
+    }
+    if (pick) delete picks[slot.id];
+    return null;
+  }
+
+  LATER_ROUNDS.forEach(m => {
+    const t1 = resolve(m.s1);
+    const t2 = resolve(m.s2);
+    results[m.id] = {team1:t1, team2:t2, round:m.round,
+      label1: t1 ? null : (m.s1.type==='winnerOf' ? `Winner of Match ${m.s1.id}` : `Loser of Match ${m.s1.id}`),
+      label2: t2 ? null : (m.s2.type==='winnerOf' ? `Winner of Match ${m.s2.id}` : `Loser of Match ${m.s2.id}`)};
+  });
+
+  const el = document.getElementById('bracket');
+  el.innerHTML = '';
+
+  const rounds = ['Round of 32','Round of 16','Quarterfinals','Semifinals','Third-place play-off','Final'];
+  rounds.forEach(roundName => {
+    const ids = Object.keys(results).filter(id => results[id].round === roundName).map(Number).sort((a,b)=>a-b);
+    if (!ids.length) return;
+    const block = document.createElement('div');
+    block.className = 'round-block';
+    const single = (roundName === 'Third-place play-off' || roundName === 'Final');
+    let datesLine = roundName === 'Round of 32' ? '' : `<p class="round-dates">${ROUND_DATES[roundName] || ''}</p>`;
+    block.innerHTML = `<h3 class="round-title">${roundName}</h3>${datesLine}<div class="bgrid${single?' single':''}" data-round="${roundName}"></div>`;
+    el.appendChild(block);
+    const grid = block.querySelector('.bgrid');
+    ids.forEach(id => grid.appendChild(matchCard(id, results[id])));
   });
 }
 
-function matchCard(date, city, team1, team2, label1, label2, tbd){
+function matchCard(id, m){
   const card = document.createElement('div');
   card.className = 'match-card';
+  const pick = picks[id];
+  const pickedWinner = pick ? pick.winner : null;
+
+  function teamHtml(team, other, label){
+    if (!team) return `<div class="teambtn placeholder">${label}</div>`;
+    let cls = '';
+    if (pickedWinner) cls = pickedWinner === team ? 'picked' : 'notpicked';
+    return `<button type="button" class="teambtn ${cls}" data-match="${id}" data-team="${escapeAttr(team)}" data-other="${escapeAttr(other||'')}">${team}</button>`;
+  }
+
+  const dateLine = m.date ? `<div class="date">${m.date} · ${m.city}</div>` : '';
   card.innerHTML = `
-    <div class="date">${date} · ${city}</div>
-    <div class="pairing">
-      <span>${team1}</span>
-      <span style="color:#b9b6a9;font-weight:400;">vs</span>
-      <span class="${tbd?'tbd':''}">${team2}</span>
-    </div>
-    <div class="meta">${label1} vs ${label2}</div>
+    ${dateLine}
+    <div class="match-id">Match ${id}</div>
+    ${teamHtml(m.team1, m.team2, m.label1)}
+    ${teamHtml(m.team2, m.team1, m.label2)}
   `;
   return card;
 }
+
+document.getElementById('bracket').addEventListener('click', e => {
+  const btn = e.target.closest('.teambtn[data-match]');
+  if (!btn) return;
+  const id = Number(btn.dataset.match);
+  picks[id] = {winner: btn.dataset.team, loser: btn.dataset.other};
+  refreshComputed();
+});
+
+document.getElementById('reset-picks').addEventListener('click', () => {
+  Object.keys(picks).forEach(k => delete picks[k]);
+  refreshComputed();
+});
 
 buildGroupShells();
 refreshComputed();
