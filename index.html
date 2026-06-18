@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup 2026 — Live tracker &amp; Round of 32 projector</title>
+<style>
+  :root{
+    --bg:#f7f6f1;
+    --card:#ffffff;
+    --ink:#1c1f1c;
+    --ink-soft:#5b5e58;
+    --line:#e4e1d6;
+    --pitch:#0e4d39;
+    --pitch-light:#e3f0ea;
+    --amber:#a9690f;
+    --amber-light:#fbf0dd;
+    --red:#9a2f2f;
+    --red-light:#f7e8e6;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 20px 80px;}
+  header{margin-bottom:18px;}
+  header h1{font-size:25px; margin:0 0 6px; letter-spacing:-0.01em;}
+  header p{margin:0; color:var(--ink-soft); font-size:14px; line-height:1.5; max-width:760px;}
+  .legend{display:flex; flex-wrap:wrap; gap:14px; margin:16px 0 6px; font-size:12px; color:var(--ink-soft);}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  .dot.green{background:var(--pitch);}
+  .dot.amber{background:var(--amber);}
+  .dot.red{background:#b9b6a9;}
+
+  section{margin-top:34px;}
+  h2{font-size:17px; margin:0 0 4px;}
+  .section-note{color:var(--ink-soft); font-size:13px; margin:0 0 14px; max-width:760px; line-height:1.5;}
+
+  .groups{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;}
+  @media (max-width:920px){ .groups{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:600px){ .groups{grid-template-columns:1fr;} }
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 14px 12px; }
+  .card h3{margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); display:flex; justify-content:space-between; align-items:baseline;}
+  .card h3 b{color:var(--ink); font-size:14px;}
+
+  table.standings{width:100%; border-collapse:collapse; font-size:13px; margin-bottom:10px;}
+  table.standings th{text-align:left; font-weight:500; color:var(--ink-soft); font-size:11px; padding:2px 4px 6px; border-bottom:1px solid var(--line);}
+  table.standings td{padding:5px 4px; border-bottom:1px solid var(--line);}
+  table.standings td.num, table.standings th.num{text-align:center; font-family:var(--mono); width:26px;}
+  table.standings tr.r-green td:first-child{border-left:3px solid var(--pitch); padding-left:6px;}
+  table.standings tr.r-amber td:first-child{border-left:3px solid var(--amber); padding-left:6px;}
+  table.standings tr.r-red td:first-child{border-left:3px solid #b9b6a9; padding-left:6px;}
+  table.standings tr:last-child td{border-bottom:none;}
+  .teamname{font-weight:500;}
+
+  .fixtures{font-size:12px; color:var(--ink-soft);}
+  .fixtures .md-label{margin:8px 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:#9b9a91;}
+  .matchrow{display:flex; align-items:center; gap:6px; padding:3px 0;}
+  .matchrow .side{flex:1; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .matchrow .side.away{text-align:left;}
+  .matchrow input{
+    width:30px; text-align:center; font-family:var(--mono); font-size:13px;
+    border:1px solid var(--line); border-radius:5px; padding:3px 2px; background:var(--bg); color:var(--ink);
+  }
+  .matchrow input:focus{outline:2px solid var(--pitch); outline-offset:1px;}
+  .matchrow .vs{color:#b9b6a9; font-size:11px;}
+  .matchrow .date{width:46px; text-align:right; color:#a9a79c; font-size:11px;}
+
+  .thirdplace{background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  table.tp{width:100%; border-collapse:collapse; font-size:13px;}
+  table.tp th{text-align:left; font-weight:500; color:var(--ink-soft); font-size:11px; padding:8px 10px; border-bottom:1px solid var(--line); background:#fbfaf7;}
+  table.tp td{padding:8px 10px; border-bottom:1px solid var(--line);}
+  table.tp td.num{font-family:var(--mono); text-align:center;}
+  table.tp tr:last-child td{border-bottom:none;}
+  table.tp tr.qualified{background:var(--pitch-light);}
+  table.tp tr.out{color:#8c8a80;}
+  .pill{font-size:11px; padding:2px 8px; border-radius:99px; font-weight:500;}
+  .pill.qualified{background:var(--pitch); color:#fff;}
+  .pill.out{background:#e7e4d9; color:#7a7868;}
+
+  .r32{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  @media (max-width:760px){ .r32{grid-template-columns:1fr;} }
+  .match-card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px;}
+  .match-card .date{font-size:11px; color:#a9a79c; margin-bottom:6px;}
+  .match-card .pairing{display:flex; align-items:center; justify-content:space-between; font-size:14px; font-weight:500; gap:10px;}
+  .match-card .pairing .tbd{color:var(--amber); font-weight:400; font-size:12.5px;}
+  .match-card .meta{font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
+
+  .updated{font-size:12px; color:var(--ink-soft); border-top:1px solid var(--line); margin-top:40px; padding-top:14px; line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>World Cup 2026 — group tracker &amp; Round of 32 projector</h1>
+    <p>Live scores entered below as of June 18, 2026. Edit any score box as matches finish and everything — standings, the third-place race, and the projected last-32 matchups — recalculates automatically.</p>
+    <div class="legend">
+      <span><i class="dot green"></i> Through automatically (top 2)</span>
+      <span><i class="dot amber"></i> 3rd place, currently inside the best-8 wildcard spots</span>
+      <span><i class="dot red"></i> 3rd place, currently outside / 4th place (eliminated)</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Group standings</h2>
+    <p class="section-note">Sorted by points, then goal difference, then goals scored. This is a simplified sort — FIFA's official tiebreakers also use head-to-head results and fair-play conduct points before falling back to the world ranking, so exact order among tied teams may differ slightly until more matches are played.</p>
+    <div class="groups" id="groups"></div>
+  </section>
+
+  <section>
+    <h2>Third-place race</h2>
+    <p class="section-note">Eight of the twelve third-place finishers join the 24 group winners and runners-up in the Round of 32. Ranked the same way as above, across all 12 groups.</p>
+    <div class="thirdplace"><table class="tp" id="tp-table"></table></div>
+  </section>
+
+  <section>
+    <h2>Round of 32 — projected from current standings</h2>
+    <p class="section-note">FIFA fixes 8 of these 16 matchups purely by group winner/runner-up, so those are filled in below using the live table above. The other 8 pit a group winner against one of the eight qualifying third-place teams — FIFA only locks in exactly which third-place team lands in which slot once the group stage ends on June 27, using a pre-published table covering all 495 possible combinations of qualifiers. Those slots are marked TBD; the third-place race above shows who's currently in the running.</p>
+    <div class="r32" id="r32"></div>
+  </section>
+
+  <p class="updated">Real results locked in above: every Matchday 1 game through June 17, plus Group K's Uzbekistan–Colombia and Group L's Ghana–Panama games which were still being played as this was built — fill those two in once they finish. Everything else is editable so you can play out the rest of the group stage and watch the Round of 32 picture take shape. This file works offline — no internet connection needed once it's open.</p>
+
+</div>
+
+<script>
+const GROUPS = {
+  A: { teams:['Mexico','South Korea','Czechia','South Africa'], matches:[
+    {h:'Mexico',a:'South Africa',d:'Jun 11',hs:2,as:0},
+    {h:'South Korea',a:'Czechia',d:'Jun 11',hs:2,as:1},
+    {h:'Czechia',a:'South Africa',d:'Jun 18',hs:null,as:null},
+    {h:'Mexico',a:'South Korea',d:'Jun 18',hs:null,as:null},
+    {h:'Czechia',a:'Mexico',d:'Jun 24',hs:null,as:null},
+    {h:'South Africa',a:'South Korea',d:'Jun 24',hs:null,as:null},
+  ]},
+  B: { teams:['Canada','Bosnia and Herzegovina','Qatar','Switzerland'], matches:[
+    {h:'Canada',a:'Bosnia and Herzegovina',d:'Jun 12',hs:1,as:1},
+    {h:'Qatar',a:'Switzerland',d:'Jun 13',hs:1,as:1},
+    {h:'Switzerland',a:'Bosnia and Herzegovina',d:'Jun 18',hs:null,as:null},
+    {h:'Canada',a:'Qatar',d:'Jun 18',hs:null,as:null},
+    {h:'Switzerland',a:'Canada',d:'Jun 24',hs:null,as:null},
+    {h:'Bosnia and Herzegovina',a:'Qatar',d:'Jun 24',hs:null,as:null},
+  ]},
+  C: { teams:['Brazil','Morocco','Haiti','Scotland'], matches:[
+    {h:'Brazil',a:'Morocco',d:'Jun 13',hs:1,as:1},
+    {h:'Haiti',a:'Scotland',d:'Jun 13',hs:0,as:1},
+    {h:'Scotland',a:'Morocco',d:'Jun 19',hs:null,as:null},
+    {h:'Brazil',a:'Haiti',d:'Jun 19',hs:null,as:null},
+    {h:'Scotland',a:'Brazil',d:'Jun 24',hs:null,as:null},
+    {h:'Morocco',a:'Haiti',d:'Jun 24',hs:null,as:null},
+  ]},
+  D: { teams:['United States','Paraguay','Australia','Türkiye'], matches:[
+    {h:'United States',a:'Paraguay',d:'Jun 12',hs:4,as:1},
+    {h:'Australia',a:'Türkiye',d:'Jun 13',hs:2,as:0},
+    {h:'United States',a:'Australia',d:'Jun 19',hs:null,as:null},
+    {h:'Türkiye',a:'Paraguay',d:'Jun 19',hs:null,as:null},
+    {h:'Türkiye',a:'United States',d:'Jun 25',hs:null,as:null},
+    {h:'Paraguay',a:'Australia',d:'Jun 25',hs:null,as:null},
+  ]},
+  E: { teams:['Germany','Curaçao','Ivory Coast','Ecuador'], matches:[
+    {h:'Germany',a:'Curaçao',d:'Jun 14',hs:7,as:1},
+    {h:'Ivory Coast',a:'Ecuador',d:'Jun 14',hs:1,as:0},
+    {h:'Germany',a:'Ivory Coast',d:'Jun 20',hs:null,as:null},
+    {h:'Ecuador',a:'Curaçao',d:'Jun 20',hs:null,as:null},
+    {h:'Ecuador',a:'Germany',d:'Jun 25',hs:null,as:null},
+    {h:'Curaçao',a:'Ivory Coast',d:'Jun 25',hs:null,as:null},
+  ]},
+  F: { teams:['Netherlands','Japan','Sweden','Tunisia'], matches:[
+    {h:'Netherlands',a:'Japan',d:'Jun 14',hs:2,as:2},
+    {h:'Sweden',a:'Tunisia',d:'Jun 14',hs:5,as:1},
+    {h:'Netherlands',a:'Sweden',d:'Jun 20',hs:null,as:null},
+    {h:'Tunisia',a:'Japan',d:'Jun 20',hs:null,as:null},
+    {h:'Japan',a:'Sweden',d:'Jun 25',hs:null,as:null},
+    {h:'Tunisia',a:'Netherlands',d:'Jun 25',hs:null,as:null},
+  ]},
+  G: { teams:['Belgium','Egypt','Iran','New Zealand'], matches:[
+    {h:'Belgium',a:'Egypt',d:'Jun 15',hs:1,as:1},
+    {h:'Iran',a:'New Zealand',d:'Jun 15',hs:2,as:2},
+    {h:'Belgium',a:'Iran',d:'Jun 21',hs:null,as:null},
+    {h:'New Zealand',a:'Egypt',d:'Jun 21',hs:null,as:null},
+    {h:'Egypt',a:'Iran',d:'Jun 26',hs:null,as:null},
+    {h:'New Zealand',a:'Belgium',d:'Jun 26',hs:null,as:null},
+  ]},
+  H: { teams:['Spain','Cape Verde','Saudi Arabia','Uruguay'], matches:[
+    {h:'Spain',a:'Cape Verde',d:'Jun 15',hs:0,as:0},
+    {h:'Saudi Arabia',a:'Uruguay',d:'Jun 15',hs:1,as:1},
+    {h:'Spain',a:'Saudi Arabia',d:'Jun 21',hs:null,as:null},
+    {h:'Uruguay',a:'Cape Verde',d:'Jun 21',hs:null,as:null},
+    {h:'Cape Verde',a:'Saudi Arabia',d:'Jun 26',hs:null,as:null},
+    {h:'Uruguay',a:'Spain',d:'Jun 26',hs:null,as:null},
+  ]},
+  I: { teams:['France','Senegal','Iraq','Norway'], matches:[
+    {h:'France',a:'Senegal',d:'Jun 16',hs:3,as:1},
+    {h:'Iraq',a:'Norway',d:'Jun 16',hs:1,as:4},
+    {h:'France',a:'Iraq',d:'Jun 22',hs:null,as:null},
+    {h:'Norway',a:'Senegal',d:'Jun 22',hs:null,as:null},
+    {h:'Norway',a:'France',d:'Jun 26',hs:null,as:null},
+    {h:'Senegal',a:'Iraq',d:'Jun 26',hs:null,as:null},
+  ]},
+  J: { teams:['Argentina','Algeria','Austria','Jordan'], matches:[
+    {h:'Argentina',a:'Algeria',d:'Jun 16',hs:3,as:0},
+    {h:'Austria',a:'Jordan',d:'Jun 17',hs:3,as:1},
+    {h:'Argentina',a:'Austria',d:'Jun 22',hs:null,as:null},
+    {h:'Jordan',a:'Algeria',d:'Jun 22',hs:null,as:null},
+    {h:'Algeria',a:'Austria',d:'Jun 27',hs:null,as:null},
+    {h:'Jordan',a:'Argentina',d:'Jun 27',hs:null,as:null},
+  ]},
+  K: { teams:['Portugal','DR Congo','Uzbekistan','Colombia'], matches:[
+    {h:'Portugal',a:'DR Congo',d:'Jun 17',hs:1,as:1},
+    {h:'Uzbekistan',a:'Colombia',d:'Jun 17',hs:null,as:null},
+    {h:'Portugal',a:'Uzbekistan',d:'Jun 23',hs:null,as:null},
+    {h:'Colombia',a:'DR Congo',d:'Jun 23',hs:null,as:null},
+    {h:'Colombia',a:'Portugal',d:'Jun 27',hs:null,as:null},
+    {h:'DR Congo',a:'Uzbekistan',d:'Jun 27',hs:null,as:null},
+  ]},
+  L: { teams:['England','Croatia','Ghana','Panama'], matches:[
+    {h:'England',a:'Croatia',d:'Jun 17',hs:4,as:2},
+    {h:'Ghana',a:'Panama',d:'Jun 17',hs:null,as:null},
+    {h:'England',a:'Ghana',d:'Jun 23',hs:null,as:null},
+    {h:'Panama',a:'Croatia',d:'Jun 23',hs:null,as:null},
+    {h:'Panama',a:'England',d:'Jun 27',hs:null,as:null},
+    {h:'Croatia',a:'Ghana',d:'Jun 27',hs:null,as:null},
+  ]},
+};
+
+// Deterministic (winner/runner-up only) matches
+const R32_DET = [
+  {date:'Jun 28', city:'Inglewood, Calif.', g1:'A', p1:1, g2:'B', p2:1},
+  {date:'Jun 29', city:'Houston', g1:'C', p1:0, g2:'F', p2:1},
+  {date:'Jun 29', city:'Guadalupe, Mexico', g1:'F', p1:0, g2:'C', p2:1},
+  {date:'Jun 30', city:'Arlington, Texas', g1:'E', p1:1, g2:'I', p2:1},
+  {date:'Jul 2', city:'Inglewood, Calif.', g1:'H', p1:0, g2:'J', p2:1},
+  {date:'Jul 2', city:'Toronto', g1:'K', p1:1, g2:'L', p2:1},
+  {date:'Jul 3', city:'Arlington, Texas', g1:'D', p1:1, g2:'G', p2:1},
+  {date:'Jul 3', city:'Miami Gardens, Fla.', g1:'J', p1:0, g2:'H', p2:1},
+];
+// Group-winner vs best-third-place slots
+const R32_THIRD = [
+  {date:'Jun 29', city:'Foxborough, Mass.', g:'E'},
+  {date:'Jun 30', city:'East Rutherford, N.J.', g:'I'},
+  {date:'Jun 30', city:'Mexico City', g:'A'},
+  {date:'Jul 1', city:'Atlanta', g:'L'},
+  {date:'Jul 1', city:'Seattle', g:'G'},
+  {date:'Jul 1', city:'Santa Clara, Calif.', g:'D'},
+  {date:'Jul 2', city:'Vancouver, Canada', g:'B'},
+  {date:'Jul 3', city:'Kansas City, Mo.', g:'K'},
+];
+
+function computeStandings(group){
+  const stats = {};
+  group.teams.forEach(t => stats[t] = {team:t, p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
+  group.matches.forEach(m => {
+    if (m.hs===null || m.as===null || m.hs==='' || m.as==='') return;
+    const hs = Number(m.hs), as = Number(m.as);
+    const H = stats[m.h], A = stats[m.a];
+    H.p++; A.p++;
+    H.gf+=hs; H.ga+=as;
+    A.gf+=as; A.ga+=hs;
+    if (hs>as){H.w++;H.pts+=3;A.l++;}
+    else if (hs<as){A.w++;A.pts+=3;H.l++;}
+    else {H.d++; A.d++; H.pts++; A.pts++;}
+  });
+  const arr = Object.values(stats);
+  arr.forEach(t=>t.gd = t.gf - t.ga);
+  arr.sort((x,y)=> y.pts-x.pts || y.gd-x.gd || y.gf-x.gf);
+  return arr;
+}
+
+function rowClass(idx, group, qualifiedGroups){
+  if (idx < 2) return 'r-green';
+  if (idx === 2) return qualifiedGroups.has(group) ? 'r-amber' : 'r-red';
+  return 'r-red';
+}
+
+// Build each group card once, including the score inputs. These never get
+// destroyed afterwards, so typing in a box doesn't lose focus.
+function buildGroupShells(){
+  const el = document.getElementById('groups');
+  el.innerHTML = '';
+  Object.keys(GROUPS).forEach(g => {
+    const group = GROUPS[g];
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    let fixtures = group.matches.map((m, idx) => `
+      <div class="matchrow">
+        <span class="side home">${m.h}</span>
+        <input type="number" min="0" data-g="${g}" data-i="${idx}" data-side="h" value="${m.hs===null?'':m.hs}" aria-label="${m.h} score">
+        <span class="vs">–</span>
+        <input type="number" min="0" data-g="${g}" data-i="${idx}" data-side="a" value="${m.as===null?'':m.as}" aria-label="${m.a} score">
+        <span class="side away">${m.a}</span>
+        <span class="date">${m.d}</span>
+      </div>`).join('');
+
+    card.innerHTML = `
+      <h3>Group ${g}</h3>
+      <table class="standings">
+        <thead><tr><th>Team</th><th class="num">P</th><th class="num">Pts</th><th class="num">GD</th></tr></thead>
+        <tbody id="stbody-${g}"></tbody>
+      </table>
+      <div class="fixtures">${fixtures}</div>
+    `;
+    el.appendChild(card);
+  });
+
+  // One delegated listener for every score box, attached once.
+  el.addEventListener('input', e => {
+    const t = e.target;
+    if (t.tagName !== 'INPUT') return;
+    const g = t.dataset.g, i = Number(t.dataset.i), side = t.dataset.side;
+    GROUPS[g].matches[i][side === 'h' ? 'hs' : 'as'] = t.value === '' ? null : t.value;
+    refreshComputed();
+  });
+}
+
+// Recomputes standings/third-place/bracket and updates only those sections —
+// the input fields themselves are left alone.
+function refreshComputed(){
+  const allStandings = {};
+  Object.keys(GROUPS).forEach(g => allStandings[g] = computeStandings(GROUPS[g]));
+
+  let thirdPool = Object.keys(GROUPS).map(g => ({...allStandings[g][2], group:g}));
+  thirdPool.sort((x,y)=> y.pts-x.pts || y.gd-x.gd || y.gf-x.gf);
+  const qualifiedGroups = new Set(thirdPool.slice(0,8).map(t=>t.group));
+
+  Object.keys(GROUPS).forEach(g => {
+    const tbody = document.getElementById(`stbody-${g}`);
+    tbody.innerHTML = allStandings[g].map((t, idx) => `
+      <tr class="${rowClass(idx, g, qualifiedGroups)}">
+        <td class="teamname">${t.team}</td>
+        <td class="num">${t.p}</td>
+        <td class="num">${t.pts}</td>
+        <td class="num">${t.gd>0?'+':''}${t.gd}</td>
+      </tr>`).join('');
+  });
+
+  renderThirdTable(thirdPool, qualifiedGroups);
+  renderR32(allStandings, thirdPool, qualifiedGroups);
+}
+
+function renderThirdTable(thirdPool, qualifiedGroups){
+  const el = document.getElementById('tp-table');
+  let head = `<tr><th>Rank</th><th>Team</th><th>Group</th><th class="num">P</th><th class="num">Pts</th><th class="num">GD</th><th></th></tr>`;
+  let rows = thirdPool.map((t, idx) => `
+    <tr class="${idx<8?'qualified':'out'}">
+      <td>${idx+1}</td>
+      <td class="teamname">${t.team}</td>
+      <td>${t.group}</td>
+      <td class="num">${t.p}</td>
+      <td class="num">${t.pts}</td>
+      <td class="num">${t.gd>0?'+':''}${t.gd}</td>
+      <td>${idx<8 ? '<span class="pill qualified">Through</span>' : '<span class="pill out">Eliminated</span>'}</td>
+    </tr>`).join('');
+  el.innerHTML = head + rows;
+}
+
+function renderR32(allStandings, thirdPool, qualifiedGroups){
+  const el = document.getElementById('r32');
+  el.innerHTML = '';
+
+  R32_DET.forEach(m => {
+    const t1 = allStandings[m.g1][m.p1];
+    const t2 = allStandings[m.g2][m.p2];
+    const label1 = m.p1===0 ? `Group ${m.g1} winner` : `Group ${m.g1} runner-up`;
+    const label2 = m.p2===0 ? `Group ${m.g2} winner` : `Group ${m.g2} runner-up`;
+    el.appendChild(matchCard(m.date, m.city, t1.team, t2.team, label1, label2));
+  });
+
+  R32_THIRD.forEach(m => {
+    const t1 = allStandings[m.g][0];
+    el.appendChild(matchCard(m.date, m.city, t1.team, 'Best 3rd-place team', `Group ${m.g} winner`, 'TBD — set once groups finish', true));
+  });
+}
+
+function matchCard(date, city, team1, team2, label1, label2, tbd){
+  const card = document.createElement('div');
+  card.className = 'match-card';
+  card.innerHTML = `
+    <div class="date">${date} · ${city}</div>
+    <div class="pairing">
+      <span>${team1}</span>
+      <span style="color:#b9b6a9;font-weight:400;">vs</span>
+      <span class="${tbd?'tbd':''}">${team2}</span>
+    </div>
+    <div class="meta">${label1} vs ${label2}</div>
+  `;
+  return card;
+}
+
+buildGroupShells();
+refreshComputed();
+</script>
+</body>
+</html>
